@@ -49,9 +49,7 @@ Este aplicativo simula o gerenciamento de motos em pátios de aluguel, inspirado
 ## ▶️ Como executar
 
 1. Clone este repositório:
-   ```bash
-   git clone [https://github.com/SEU_USUARIO/mottu-mobile-rm555708.git](https://github.com/GuGoulart/EntregraMobileSprint1)
-   Instale as dependências:
+git clone [https://github.com/SEU_USUARIO/mottu-mobile-rm555708.git](https://github.com/GuGoulart/EntregraMobileSprint1)
 
 2. Instale as dependências:
 npm install
