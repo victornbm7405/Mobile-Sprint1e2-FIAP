@@ -1,4 +1,4 @@
-# 📱 Mottu Mobile - Gerenciador de Motos
+# Mottu Mobile - Gerenciador de Motos
 
 Projeto desenvolvido para a disciplina **Mobile Application Development** – 2º Semestre de 2025.
 
@@ -6,7 +6,7 @@ Este aplicativo simula o gerenciamento de motos em pátios de aluguel, inspirado
 
 ---
 
-## 👤 Integrante
+## Integrante
 
 - **Nome:** Gustavo Goulart Bretas  **RM:** 555708
 - **Nome:** Alice Teixeira Caldeira  **RM:** 556293
@@ -14,7 +14,7 @@ Este aplicativo simula o gerenciamento de motos em pátios de aluguel, inspirado
 
 ---
 
-## 🚀 Tecnologias e bibliotecas utilizadas
+## Tecnologias e bibliotecas utilizadas
 
 - [React Native](https://reactnative.dev/)
 - [Expo](https://expo.dev/)
@@ -24,7 +24,7 @@ Este aplicativo simula o gerenciamento de motos em pátios de aluguel, inspirado
 
 ---
 
-## 🧩 Funcionalidades implementadas
+## Funcionalidades implementadas
 
 ✅ Navegação entre telas  
 ✅ Cadastro e listagem de motos  
@@ -36,7 +36,7 @@ Este aplicativo simula o gerenciamento de motos em pátios de aluguel, inspirado
 
 ---
 
-## 📸 Telas
+## Telas
 
 - Tela inicial (Home)
 - Lista de Motos
@@ -46,10 +46,10 @@ Este aplicativo simula o gerenciamento de motos em pátios de aluguel, inspirado
 
 ---
 
-## ▶️ Como executar
+## ▶Como executar
 
 1. Clone este repositório:
-git clone [https://github.com/SEU_USUARIO/mottu-mobile-rm555708.git](https://github.com/GuGoulart/EntregraMobileSprint1)
+git clone [https://github.com/GuGoulart/EntregraMobileSprint1](https://github.com/GuGoulart/EntregraMobileSprint1)
 
 2. Instale as dependências:
 npm install
