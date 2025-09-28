@@ -51,10 +51,10 @@ Este aplicativo simula o gerenciamento de motos em pátios de aluguel, inspirado
 1. Clone este repositório:
 git clone [https://github.com/GuGoulart/EntregraMobileSprint1](https://github.com/GuGoulart/EntregraMobileSprint1)
 
-2. Instale as dependências:
+2. Instale as dependências
 npm install
 
-3. Rode o projeto com:
+3. Rode o projeto com
 npx expo start
 
 4. Use no navegador ou escaneie o QR code com o app do Expo Go.
