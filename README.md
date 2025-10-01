@@ -1,125 +1,161 @@
 # Motorcycle Manager
 
-Aplicativo React Native com Expo para gerenciamento de motocicletas.
+**ENTREGA — 3º SPRINT (Mobile)**
+
+Aplicativo mobile em **React Native + Expo** para gestão de **motos** e **áreas de operação**, com autenticação via **Firebase** e integração com **API REST**.
 
 ---
 
-## Integrante
+## 📌 Proposta
+Gerenciar o ciclo de vida de motos da operação (criar, listar, editar e excluir), vinculando cada moto a uma **área**. O acesso é controlado por **login/logout** (Firebase).
 
-- **Nome:** Gustavo Goulart Bretas  **RM:** 555708
-- **Nome:** Alice Teixeira Caldeira  **RM:** 556293
-- **Nome:** Victor Nieves Britto Medeiros  **RM:** 554557
+### ✨ Funcionalidades
+- **Autenticação** com Firebase (login / logout, persistência de sessão)
+- **CRUD de Motos** (Create, Read, Update, Delete)
+- **Associação de Área** por moto (consumo de API REST de Áreas)
+- **Lista com busca/atualização** e tela de **detalhes/edição**
+- **Tema claro/escuro** (Theme Context)
+- **Navegação** com **Expo Router**
 
 ---
 
-## 🚀 Funcionalidades
+## 🧱 Estrutura de Pastas (resumo)
 
-- ✅ **Autenticação Firebase** - Login e cadastro de usuários
-- ✅ **Dashboard Home** - Visão geral com estatísticas e ações rápidas
-- ✅ **Cadastro de Motos** - Formulário para adicionar motos (modelo, placa, fabricante)
-- ✅ **Lista com CRUD** - Visualizar, editar, excluir e buscar motos
-- ✅ **Configurações** - Alternância entre tema claro/escuro
-- ✅ **AsyncStorage** - Armazenamento local das motos
-- ✅ **Design Moderno** - Interface com cores verde e preto
+```text
+Mobile-Sprint1e2-FIAP-main/
+│   ├── .env
+│   ├── .gitignore
+│   ├── App.tsx
+│   ├── README.md
+│   ├── app.json
+│   ├── babel.config.js
+│   ├── components.json
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── tsconfig.json
+  ├── .expo/
+  │   ├── README.md
+  │   ├── devices.json
+  ├── app/
+  │   ├── favicon.ico
+  │   ├── globals.css
+  │   ├── layout.tsx
+  │   ├── page.tsx
+  ├── assets/
+  │   ├── adaptive-icon.png
+  │   ├── favicon.png
+  │   ├── icon.png
+  │   ├── splash.png
+  ├── lib/
+  │   ├── utils.ts
+  ├── src/
+    ├── components/
+    │   ├── CustomButton.tsx
+    │   ├── CustomInput.tsx
+    ├── config/
+    │   ├── firebase.ts
+    ├── contexts/
+    │   ├── AuthContext.tsx
+    │   ├── ThemeContext.tsx
+    ├── screens/
+    │   ├── AddMotorcycleScreen.tsx
+    │   ├── AddMotorcycleScreen.tsx.bak
+    │   ├── AuthScreen.tsx
+    │   ├── EditMotorcycleScreen.tsx
+    │   ├── HomeScreen.tsx
+    │   ├── MotorcycleFormScreen.tsx
+    │   ├── MotorcycleListScreen.tsx
+    │   ├── MotorcycleListScreen.tsx.bak
+    │   ├── SettingsScreen.tsx
+    ├── services/
+    │   ├── areaService.ts
+    │   ├── areaService.ts.bak
+    │   ├── config.ts
+    │   ├── config.ts.bak
+    │   ├── motorcycleService.ts
+    │   ├── motorcycleService.ts.bak
+    ├── types/
+    │   ├── motorcycle.ts
+    │   ├── motorcycle.ts.bak
+```
 
-## 🛠️ Tecnologias
+> Pastas-chave:
+- `src/screens/` — Telas (Auth, Home, Lista/Edição/Cadastro de Motos, Settings)
+- `src/services/` — Integração com API (`motorcycleService.ts`, `areaService.ts`, `config.ts`)
+- `src/contexts/` — `AuthContext.tsx`, `ThemeContext.tsx`
+- `src/config/` — `firebase.ts` (inicialização do Firebase)
+- `app/` — Rotas e layout via **expo-router**
+- `assets/` — Ícones e imagens do aplicativo
 
-- React Native
-- Expo
-- TypeScript
-- Firebase Authentication
-- AsyncStorage
-- React Navigation
-- Expo Vector Icons
+---
 
-## 📱 Como executar
+## 👥 Integrantes (Nome • RM • GitHub)
+Desenvolvido por: 
+RM 556293 Alice Teixeira Caldeira 
+RM 555708 Gustavo Goulart 
+RM 554557 Victor Medeiros
 
-1. **Clone ou baixe o projeto**
-2. **Instale as dependências:**
-   \`\`\`bash
-   npm install
-   # ou
-   expo install
-   \`\`\`
+# API base
+https://sprint1-dotnet.onrender.com
+---
 
-3. **Configure o Firebase:**
-   - Crie um projeto no [Firebase Console](https://console.firebase.google.com/)
-   - Ative a autenticação por email/senha
-   - Substitua as configurações em `src/config/firebase.ts`
+## ▶️ Como Rodar no **Expo Go**
 
-4. **Execute o projeto:**
-   \`\`\`bash
-   npx expo start
-   \`\`\`
+### 1) Pré-requisitos
+- **Node.js 20.x** (recomendado)
+- **Expo CLI** (usar via `npx expo` já é suficiente)
+- App **Expo Go** instalado no celular (Android/iOS)
+- Estar **no mesmo Wi‑Fi** do computador (para modo LAN)
 
-5. **Teste no dispositivo:**
-   - Instale o Expo Go no seu Android
-   - Escaneie o QR code gerado
+### 2) Instalação
+```bash
+# dentro da pasta do projeto
+npm install
+```
 
-## 🎨 Design
+### 3) Variáveis de Ambiente
+O arquivo `.env` tem que estar desse jeito:
 
-O aplicativo utiliza um sistema de cores moderno:
-- **Primary:** Verde (#10B981)
-- **Secondary:** Verde escuro (#059669)
-- **Suporte completo a tema claro/escuro**
-- **Interface responsiva e acessível**
+```env
+EXPO_PUBLIC_FIREBASE_API_KEY="AIzaSyByhxFhGfeu_aV40oOuwKzIAPwCnPe9Tfg"
+EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN="projetovictor-817ad.firebaseapp.com"
+EXPO_PUBLIC_FIREBASE_PROJECT_ID="projetovictor-817ad"
+EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET="projetovictor-817ad.firebasestorage.app"
+EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID="777243568227"
+EXPO_PUBLIC_FIREBASE_APP_ID="1:777243568227:web:e19b9011be5ec79fe2b056"
 
-## 📁 Estrutura do Projeto
+# API base
+https://sprint1-dotnet.onrender.com
 
-\`\`\`
-src/
-├── components/          # Componentes reutilizáveis
-├── contexts/           # Contextos (Auth, Theme)
-├── screens/            # Telas do aplicativo
-├── services/           # Serviços (AsyncStorage)
-├── types/              # Tipos TypeScript
-└── config/             # Configurações (Firebase)
-\`\`\`
+### 4) Iniciar o projeto
+```bash
+npx expo start
+```
 
-## 🔧 Configuração do Firebase
+- **Conexão LAN (recomendada no mesmo Wi‑Fi):** abra o Expo Go e escaneie o QR Code.
+- **Se a LAN não funcionar:** pressione **`?`** no terminal do Expo e selecione **Tunnel** (ou execute com `--tunnel`).
 
-Substitua as configurações em `src/config/firebase.ts`:
+### 5) Erros comuns
+- **Assets faltando (`icon.png`, `splash.png`)**: garanta que existam em `assets/` (ou ajuste `app.json`).
+- **Variáveis `.env` não lidas**: reinicie o bundler (`r`) e confirme os nomes das chaves acima.
+- **Firebase Auth ‘component not registered’**: confira a inicialização em `src/config/firebase.ts` e que não há import cíclico.
 
-\`\`\`typescript
-const firebaseConfig = {
-  apiKey: "sua-api-key",
-  authDomain: "seu-projeto.firebaseapp.com",
-  projectId: "seu-projeto-id",
-  storageBucket: "seu-projeto.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "seu-app-id"
-};
-\`\`\`
+---
 
-## 📱 Telas do Aplicativo
+## 🔧 Tecnologias e Versões
 
-1. **Login/Cadastro** - Autenticação de usuários
-2. **Home** - Dashboard com estatísticas e ações rápidas
-3. **Cadastrar Moto** - Formulário de cadastro
-4. **Lista de Motos** - CRUD completo com busca
-5. **Configurações** - Alternância de tema e informações da conta
+| Pacote | Versão |
+|---|---|
+| Expo SDK | ^54.0.0 |
+| Expo Router | ~5.1.7 |
+| React | 19.1.0 |
+| React Native | 0.81.4 |
+| Firebase | ^12.3.0 |
+| TypeScript | ~5.8.3 |
 
-## 🎯 Funcionalidades Detalhadas
+> Outras dependências relevantes: `@react-navigation/*`, `react-native-gesture-handler`, `react-native-reanimated`, `react-native-safe-area-context`, etc. Verifique `package.json` para a lista completa.
 
-### Cadastro de Motos
-- Campos: Modelo, Placa, Fabricante
-- Validação de placa brasileira
-- Sugestões de fabricantes populares
-- Armazenamento local com AsyncStorage
+---
 
-### Lista de Motos
-- Visualização em cards
-- Busca por modelo, placa ou fabricante
-- Edição inline
-- Exclusão com confirmação
-- Pull-to-refresh
-
-### Configurações
-- Alternância tema claro/escuro
-- Informações da conta
-- Sobre o aplicativo
-- Logout seguro
-
-## 📄 Licença
-
-Este projeto foi criado para fins educacionais e de demonstração.
+## 📝 Observações
+- Recomenda-se **Node 20** para compatibilidade com o Expo SDK 54.
