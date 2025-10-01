@@ -3,9 +3,9 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import HomeScreen from './src/screens/HomeScreen';
-import MotoListScreen from './src/screens/MotoListScreen';
-import MotoFormScreen from './src/screens/MotoFormScreen';
-import MotoDetailScreen from './src/screens/MotoDetailScreen';
+import MotoListScreen from './src/screens/MotorcycleListScreen';
+import MotoFormScreen from './src/screens/AddMotorcycleScreen';
+import MotoDetailScreen from './src/screens/EditMotorcycleScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 
 export type RootStackParamList = {
