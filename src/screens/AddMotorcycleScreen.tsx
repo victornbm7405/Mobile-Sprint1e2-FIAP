@@ -1,7 +1,7 @@
-"use client"
+﻿"use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import {
   View,
   Text,
@@ -18,6 +18,7 @@ import { useTheme } from "../contexts/ThemeContext"
 import { motorcycleService } from "../services/motorcycleService"
 import { CustomButton } from "../components/CustomButton"
 import { CustomInput } from "../components/CustomInput"
+import { listAreas, type Area } from "../services/areaService"
 
 interface AddMotorcycleScreenProps {
   navigation: any
@@ -26,12 +27,27 @@ interface AddMotorcycleScreenProps {
 export const AddMotorcycleScreen: React.FC<AddMotorcycleScreenProps> = ({ navigation }) => {
   const { theme } = useTheme()
   const [loading, setLoading] = useState(false)
+
+  // removido "fabricante"; adicionado "areaId"
   const [formData, setFormData] = useState({
     modelo: "",
     placa: "",
-    fabricante: "",
+    areaId: undefined as unknown as number, // obrigatório
   })
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
+
+  // Áreas para seleção (substitui “fabricantes populares”)
+  const [areas, setAreas] = useState<Area[]>([])
+  useEffect(() => {
+    ;(async () => {
+      try {
+        const list = await listAreas()
+        setAreas(list)
+      } catch {
+        // se falhar, usuário ainda pode tentar salvar e veremos o erro do backend
+      }
+    })()
+  }, [])
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {}
@@ -46,8 +62,8 @@ export const AddMotorcycleScreen: React.FC<AddMotorcycleScreenProps> = ({ naviga
       newErrors.placa = "Formato de placa inválido (ex: ABC1234 ou ABC1D23)"
     }
 
-    if (!formData.fabricante.trim()) {
-      newErrors.fabricante = "Fabricante é obrigatório"
+    if (!formData.areaId) {
+      newErrors.areaId = "Selecione uma área"
     }
 
     setErrors(newErrors)
@@ -62,8 +78,8 @@ export const AddMotorcycleScreen: React.FC<AddMotorcycleScreenProps> = ({ naviga
       await motorcycleService.save({
         modelo: formData.modelo.trim(),
         placa: formData.placa.trim().toUpperCase(),
-        fabricante: formData.fabricante.trim(),
-      })
+        areaId: formData.areaId!,
+      } as any)
 
       Alert.alert("Sucesso", "Moto cadastrada com sucesso!", [
         {
@@ -94,19 +110,6 @@ export const AddMotorcycleScreen: React.FC<AddMotorcycleScreenProps> = ({ naviga
     }
   }
 
-  const popularFabricantes = [
-    "Honda",
-    "Yamaha",
-    "Suzuki",
-    "Kawasaki",
-    "BMW",
-    "Ducati",
-    "Harley-Davidson",
-    "Triumph",
-    "KTM",
-    "Aprilia",
-  ]
-
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.keyboardView}>
@@ -130,6 +133,7 @@ export const AddMotorcycleScreen: React.FC<AddMotorcycleScreenProps> = ({ naviga
 
           {/* Form */}
           <View style={styles.form}>
+            {/* Modelo (inalterado) */}
             <CustomInput
               label="Modelo"
               value={formData.modelo}
@@ -138,6 +142,7 @@ export const AddMotorcycleScreen: React.FC<AddMotorcycleScreenProps> = ({ naviga
               error={errors.modelo}
             />
 
+            {/* Placa (inalterado) */}
             <CustomInput
               label="Placa"
               value={formData.placa}
@@ -146,35 +151,33 @@ export const AddMotorcycleScreen: React.FC<AddMotorcycleScreenProps> = ({ naviga
               error={errors.placa}
             />
 
+            {/* Seleção de Área (substitui fabricantes populares) */}
             <View>
-              <CustomInput
-                label="Fabricante"
-                value={formData.fabricante}
-                onChangeText={(text) => setFormData({ ...formData, fabricante: text })}
-                placeholder="Ex: Honda"
-                error={errors.fabricante}
-              />
+              <Text style={[styles.suggestionsTitle, { color: theme.textSecondary }]}>Selecione a Área *</Text>
+              {errors.areaId ? (
+                <Text style={{ color: "#d00", marginBottom: 6, fontSize: 12 }}>{errors.areaId}</Text>
+              ) : null}
 
-              {/* Fabricantes populares */}
-              <View style={styles.suggestionsContainer}>
-                <Text style={[styles.suggestionsTitle, { color: theme.textSecondary }]}>Fabricantes populares:</Text>
-                <View style={styles.suggestionsGrid}>
-                  {popularFabricantes.map((fabricante) => (
+              <View style={styles.suggestionsGrid}>
+                {areas.map((a) => {
+                  const active = formData.areaId === a.id
+                  return (
                     <TouchableOpacity
-                      key={fabricante}
+                      key={a.id}
                       style={[
                         styles.suggestionChip,
                         {
                           backgroundColor: theme.surface,
                           borderColor: theme.border,
+                          opacity: active ? 0.9 : 1,
                         },
                       ]}
-                      onPress={() => setFormData({ ...formData, fabricante })}
+                      onPress={() => setFormData({ ...formData, areaId: a.id })}
                     >
-                      <Text style={[styles.suggestionText, { color: theme.text }]}>{fabricante}</Text>
+                      <Text style={[styles.suggestionText, { color: theme.text }]}>{a.nome}</Text>
                     </TouchableOpacity>
-                  ))}
-                </View>
+                  )
+                })}
               </View>
             </View>
 
@@ -238,9 +241,7 @@ const styles = StyleSheet.create({
   form: {
     gap: 20,
   },
-  suggestionsContainer: {
-    marginTop: 12,
-  },
+  // Mantidos — reaproveitados para Áreas
   suggestionsTitle: {
     fontSize: 14,
     marginBottom: 8,

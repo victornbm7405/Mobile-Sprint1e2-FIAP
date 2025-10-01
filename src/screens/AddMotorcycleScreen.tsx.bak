@@ -19,38 +19,25 @@ import { motorcycleService } from "../services/motorcycleService"
 import { CustomButton } from "../components/CustomButton"
 import { CustomInput } from "../components/CustomInput"
 import { listAreas, type Area } from "../services/areaService"
-import { useRoute, useNavigation, RouteProp } from "@react-navigation/native"
 
-type MotorcycleParam = {
-  EditMotorcycle: {
-    motorcycle: {
-      id: string | number
-      modelo: string
-      placa: string
-      areaId?: number
-      areaNome?: string
-      createdAt?: string
-    }
-  }
+interface AddMotorcycleScreenProps {
+  navigation: any
 }
 
-export const EditMotorcycleScreen: React.FC = () => {
+export const AddMotorcycleScreen: React.FC<AddMotorcycleScreenProps> = ({ navigation }) => {
   const { theme } = useTheme()
-  const navigation = useNavigation<any>()
-  const route = useRoute<RouteProp<MotorcycleParam, "EditMotorcycle">>()
-  const current = route.params?.motorcycle
-
   const [loading, setLoading] = useState(false)
 
-  // mesmo shape da tela de cadastro
+  // ↓↓↓ removido "fabricante"; adicionado "areaId"
   const [formData, setFormData] = useState({
-    modelo: current?.modelo ?? "",
-    placa: current?.placa ?? "",
-    areaId: (current?.areaId as number | undefined) ?? (undefined as unknown as number),
+    modelo: "",
+    placa: "",
+    areaId: undefined as unknown as number, // obrigatório
   })
+
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
 
-  // Áreas (mesmo componente visual/chips)
+  // Áreas para substituir “fabricantes populares”
   const [areas, setAreas] = useState<Area[]>([])
   useEffect(() => {
     ;(async () => {
@@ -58,7 +45,7 @@ export const EditMotorcycleScreen: React.FC = () => {
         const list = await listAreas()
         setAreas(list)
       } catch {
-        // se falhar, ainda dá pra tentar salvar; apenas sem nomes de áreas
+        // opcional: Alert.alert("Erro", "Não foi possível carregar as áreas")
       }
     })()
   }, [])
@@ -76,6 +63,7 @@ export const EditMotorcycleScreen: React.FC = () => {
       newErrors.placa = "Formato de placa inválido (ex: ABC1234 ou ABC1D23)"
     }
 
+    // ↓↓↓ em vez de fabricante, exigir área
     if (!formData.areaId) {
       newErrors.areaId = "Selecione uma área"
     }
@@ -84,25 +72,26 @@ export const EditMotorcycleScreen: React.FC = () => {
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSave = async () => {
-    if (!current?.id) {
-      Alert.alert("Erro", "Registro inválido para edição.")
-      return
-    }
+  const handleSubmit = async () => {
     if (!validateForm()) return
 
     setLoading(true)
     try {
-      await motorcycleService.update(current.id, {
+      // ↓↓↓ enviar areaId no lugar de fabricante
+      await motorcycleService.save({
         modelo: formData.modelo.trim(),
         placa: formData.placa.trim().toUpperCase(),
-        areaId: formData.areaId!,
-      })
-      Alert.alert("Sucesso", "Moto atualizada com sucesso!", [
-        { text: "OK", onPress: () => navigation.goBack() },
+        areaId: formData.areaId,
+      } as any)
+
+      Alert.alert("Sucesso", "Moto cadastrada com sucesso!", [
+        {
+          text: "OK",
+          onPress: () => navigation.goBack(),
+        },
       ])
-    } catch (e) {
-      Alert.alert("Erro", "Não foi possível atualizar a moto. Tente novamente.")
+    } catch (error) {
+      Alert.alert("Erro", "Não foi possível cadastrar a moto. Tente novamente.")
     } finally {
       setLoading(false)
     }
@@ -124,12 +113,12 @@ export const EditMotorcycleScreen: React.FC = () => {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.keyboardView}>
-        {/* Header idêntico ao de cadastro */}
+        {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
             <Ionicons name="arrow-back" size={24} color={theme.text} />
           </TouchableOpacity>
-          <Text style={[styles.headerTitle, { color: theme.text }]}>Editar Moto</Text>
+          <Text style={[styles.headerTitle, { color: theme.text }]}>Cadastrar Moto</Text>
           <View style={styles.placeholder} />
         </View>
 
@@ -139,11 +128,12 @@ export const EditMotorcycleScreen: React.FC = () => {
             <View style={[styles.iconCircle, { backgroundColor: `${theme.primary}20` }]}>
               <Ionicons name="bicycle" size={48} color={theme.primary} />
             </View>
-            <Text style={[styles.iconText, { color: theme.textSecondary }]}>Atualize os dados da sua moto</Text>
+            <Text style={[styles.iconText, { color: theme.textSecondary }]}>Preencha os dados da sua moto</Text>
           </View>
 
-          {/* Form (mesmos componentes e estilos) */}
+          {/* Form */}
           <View style={styles.form}>
+            {/* Modelo (inalterado) */}
             <CustomInput
               label="Modelo"
               value={formData.modelo}
@@ -152,6 +142,7 @@ export const EditMotorcycleScreen: React.FC = () => {
               error={errors.modelo}
             />
 
+            {/* Placa (inalterado) */}
             <CustomInput
               label="Placa"
               value={formData.placa}
@@ -160,13 +151,15 @@ export const EditMotorcycleScreen: React.FC = () => {
               error={errors.placa}
             />
 
-            {/* Seleção de Área (chips) */}
+            {/* >>> Substitui o bloco 'Fabricante' + 'Fabricantes populares' por seleção de Áreas <<< */}
             <View>
+              {/* Rótulo mantém mesma hierarquia visual do antigo bloco */}
               <Text style={[styles.suggestionsTitle, { color: theme.textSecondary }]}>Selecione a Área *</Text>
               {errors.areaId ? (
                 <Text style={{ color: "#d00", marginBottom: 6, fontSize: 12 }}>{errors.areaId}</Text>
               ) : null}
 
+              {/* Usa exatamente a mesma grade/estilo dos chips de fabricantes para não alterar o CSS */}
               <View style={styles.suggestionsGrid}>
                 {areas.map((a) => {
                   const active = formData.areaId === a.id
@@ -178,12 +171,15 @@ export const EditMotorcycleScreen: React.FC = () => {
                         {
                           backgroundColor: theme.surface,
                           borderColor: theme.border,
+                          // realce simples quando selecionado (sem mudar sua paleta)
                           opacity: active ? 0.9 : 1,
                         },
                       ]}
                       onPress={() => setFormData({ ...formData, areaId: a.id })}
                     >
-                      <Text style={[styles.suggestionText, { color: theme.text }]}>{a.nome}</Text>
+                      <Text style={[styles.suggestionText, { color: theme.text }]}>
+                        {a.nome}
+                      </Text>
                     </TouchableOpacity>
                   )
                 })}
@@ -191,7 +187,7 @@ export const EditMotorcycleScreen: React.FC = () => {
             </View>
 
             <View style={styles.buttonContainer}>
-              <CustomButton title="Salvar alterações" onPress={handleSave} loading={loading} />
+              <CustomButton title="Cadastrar Moto" onPress={handleSubmit} loading={loading} />
               <CustomButton title="Cancelar" onPress={() => navigation.goBack()} variant="outline" />
             </View>
           </View>
@@ -202,27 +198,78 @@ export const EditMotorcycleScreen: React.FC = () => {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  keyboardView: { flex: 1 },
+  container: {
+    flex: 1,
+  },
+  keyboardView: {
+    flex: 1,
+  },
   header: {
-    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
-    paddingHorizontal: 20, paddingVertical: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingVertical: 16,
   },
-  backButton: { width: 40, height: 40, alignItems: "center", justifyContent: "center" },
-  headerTitle: { fontSize: 18, fontWeight: "600" },
-  placeholder: { width: 40 },
-  scrollContent: { padding: 20 },
-  iconContainer: { alignItems: "center", marginBottom: 32 },
+  backButton: {
+    width: 40,
+    height: 40,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+  },
+  placeholder: {
+    width: 40,
+  },
+  scrollContent: {
+    padding: 20,
+  },
+  iconContainer: {
+    alignItems: "center",
+    marginBottom: 32,
+  },
   iconCircle: {
-    width: 96, height: 96, borderRadius: 24, alignItems: "center", justifyContent: "center", marginBottom: 16,
+    width: 96,
+    height: 96,
+    borderRadius: 24,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 16,
   },
-  iconText: { fontSize: 16, textAlign: "center" },
-  form: { gap: 20 },
-  suggestionsTitle: { fontSize: 14, marginBottom: 8 },
-  suggestionsGrid: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
-  suggestionChip: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16, borderWidth: 1 },
-  suggestionText: { fontSize: 14 },
-  buttonContainer: { gap: 12, marginTop: 20 },
+  iconText: {
+    fontSize: 16,
+    textAlign: "center",
+  },
+  form: {
+    gap: 20,
+  },
+  // mantidos — reutilizados para Área
+  suggestionsContainer: {
+    marginTop: 12,
+  },
+  suggestionsTitle: {
+    fontSize: 14,
+    marginBottom: 8,
+  },
+  suggestionsGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  suggestionChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    borderWidth: 1,
+  },
+  suggestionText: {
+    fontSize: 14,
+  },
+  buttonContainer: {
+    gap: 12,
+    marginTop: 20,
+  },
 })
-
-export default EditMotorcycleScreen

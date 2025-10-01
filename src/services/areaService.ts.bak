@@ -1,0 +1,17 @@
+﻿// src/services/areaService.ts  (novo)
+import { API_BASE } from "./config";
+
+export type Area = { id: number; nome: string };
+
+type Page<T> = { items: T[]; total: number; page: number; pageSize: number };
+
+/** Lista até 1000 áreas para preencher selects/filtros. */
+export async function listAreas(): Promise<Area[]> {
+  const r = await fetch(`${API_BASE}/api/area?page=1&pageSize=1000`);
+  if (!r.ok) {
+    const t = await r.text().catch(() => "");
+    throw new Error(`Falha ao listar áreas: ${r.status} ${t}`);
+  }
+  const page: Page<Area> = await r.json();
+  return page.items ?? [];
+}

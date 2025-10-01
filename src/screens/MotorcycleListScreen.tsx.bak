@@ -1,5 +1,6 @@
 ﻿"use client"
 
+import { listAreas, type Area } from "../services/areaService"
 import type React from "react"
 import { useState, useEffect, useCallback } from "react"
 import {
@@ -18,7 +19,6 @@ import { useTheme } from "../contexts/ThemeContext"
 import { motorcycleService } from "../services/motorcycleService"
 import type { Motorcycle } from "../types/motorcycle"
 import { useFocusEffect } from "@react-navigation/native"
-import { listAreas, type Area } from "../services/areaService"
 
 interface MotorcycleListScreenProps {
   navigation: any
@@ -32,29 +32,6 @@ export const MotorcycleListScreen: React.FC<MotorcycleListScreenProps> = ({ navi
   const [refreshing, setRefreshing] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
 
-  // Áreas para resolver nome pela id
-  const [areas, setAreas] = useState<Area[]>([])
-  const areaName = useCallback(
-    (id?: number) => {
-      if (id == null) return ""
-      const a = areas.find((x) => x.id === id)
-      return a?.nome ?? String(id)
-    },
-    [areas],
-  )
-
-  // Carrega as áreas 1x
-  useEffect(() => {
-    ;(async () => {
-      try {
-        const a = await listAreas()
-        setAreas(a)
-      } catch {
-        // segue com fallback para o id
-      }
-    })()
-  }, [])
-
   useFocusEffect(
     useCallback(() => {
       loadMotorcycles()
@@ -63,7 +40,7 @@ export const MotorcycleListScreen: React.FC<MotorcycleListScreenProps> = ({ navi
 
   useEffect(() => {
     filterMotorcycles()
-  }, [motorcycles, searchQuery, areas])
+  }, [motorcycles, searchQuery])
 
   const loadMotorcycles = async () => {
     try {
@@ -90,12 +67,21 @@ export const MotorcycleListScreen: React.FC<MotorcycleListScreenProps> = ({ navi
     }
 
     const q = searchQuery.toLowerCase()
-    const filtered = motorcycles.filter((motorcycle: any) => {
-      const modelo = (motorcycle.modelo ?? "").toLowerCase()
-      const placa = (motorcycle.placa ?? "").toLowerCase()
-      const aNome = areaName(motorcycle.areaId).toLowerCase()
-      return modelo.includes(q) || placa.includes(q) || aNome.includes(q)
+    const filtered = motorcycles.filter((m: any) => {
+      const modelo = (m.modelo ?? "").toLowerCase()
+      const placa = (m.placa ?? "").toLowerCase()
+      // >>> trocar fabricante por área (prioriza areaNome; fallback para areaId como string)
+      const areaNome = (m.areaNome ?? "").toLowerCase()
+      const areaIdStr = m.areaId != null ? String(m.areaId).toLowerCase() : ""
+
+      return (
+        modelo.includes(q) ||
+        placa.includes(q) ||
+        areaNome.includes(q) ||
+        areaIdStr.includes(q)
+      )
     })
+
     setFilteredMotorcycles(filtered)
   }
 
@@ -105,26 +91,22 @@ export const MotorcycleListScreen: React.FC<MotorcycleListScreenProps> = ({ navi
   }
 
   const handleDelete = (motorcycle: Motorcycle) => {
-    Alert.alert(
-      "Confirmar exclusão",
-      `Deseja excluir a moto ${motorcycle.modelo}?`,
-      [
-        { text: "Cancelar", style: "cancel" },
-        {
-          text: "Excluir",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              await motorcycleService.delete((motorcycle as any).id)
-              loadMotorcycles()
-              Alert.alert("Sucesso", "Moto excluída com sucesso")
-            } catch (error) {
-              Alert.alert("Erro", "Não foi possível excluir a moto")
-            }
-          },
+    Alert.alert("Confirmar exclusão", `Deseja excluir a moto ${motorcycle.modelo}?`, [
+      { text: "Cancelar", style: "cancel" },
+      {
+        text: "Excluir",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            await motorcycleService.delete((motorcycle as any).id)
+            loadMotorcycles()
+            Alert.alert("Sucesso", "Moto excluída com sucesso")
+          } catch (error) {
+            Alert.alert("Erro", "Não foi possível excluir a moto")
+          }
         },
-      ],
-    )
+      },
+    ])
   }
 
   const handleEdit = (motorcycle: Motorcycle) => {
@@ -132,52 +114,28 @@ export const MotorcycleListScreen: React.FC<MotorcycleListScreenProps> = ({ navi
   }
 
   const renderMotorcycleItem = ({ item }: { item: any }) => (
-    <View
-      style={[
-        styles.motorcycleCard,
-        { backgroundColor: theme.surface, borderColor: theme.border },
-      ]}
-    >
+    <View style={[styles.motorcycleCard, { backgroundColor: theme.surface, borderColor: theme.border }]}>
       <View style={styles.motorcycleHeader}>
-        <View
-          style={[
-            styles.motorcycleIcon,
-            { backgroundColor: `${theme.primary}20` },
-          ]}
-        >
+        <View style={[styles.motorcycleIcon, { backgroundColor: `${theme.primary}20` }]}>
           <Ionicons name="bicycle" size={24} color={theme.primary} />
         </View>
         <View style={styles.motorcycleInfo}>
-          <Text style={[styles.motorcycleModel, { color: theme.text }]}>
-            {item.modelo}
-          </Text>
-          <Text
-            style={[styles.motorcyclePlate, { color: theme.textSecondary }]}
-          >
-            {item.placa}
-          </Text>
-          {/* Exibe NOME da área (ou id se não encontrado) no lugar do fabricante */}
-          <Text
-            style={[styles.motorcycleBrand, { color: theme.textSecondary }]}
-          >
-            {areaName(item.areaId)}
+          <Text style={[styles.motorcycleModel, { color: theme.text }]}>{item.modelo}</Text>
+          <Text style={[styles.motorcyclePlate, { color: theme.textSecondary }]}>{item.placa}</Text>
+          {/* >>> aqui substituímos 'fabricante' por a área cadastrada (nome da área, senão o ID) */}
+          <Text style={[styles.motorcycleBrand, { color: theme.textSecondary }]}>
+            {item.areaNome ?? (item.areaId != null ? String(item.areaId) : "")}
           </Text>
         </View>
         <View style={styles.motorcycleActions}>
           <TouchableOpacity
-            style={[
-              styles.actionButton,
-              { backgroundColor: `${theme.primary}20` },
-            ]}
+            style={[styles.actionButton, { backgroundColor: `${theme.primary}20` }]}
             onPress={() => handleEdit(item)}
           >
             <Ionicons name="pencil" size={16} color={theme.primary} />
           </TouchableOpacity>
           <TouchableOpacity
-            style={[
-              styles.actionButton,
-              { backgroundColor: `${theme.error}20` },
-            ]}
+            style={[styles.actionButton, { backgroundColor: `${theme.error}20` }]}
             onPress={() => handleDelete(item)}
           >
             <Ionicons name="trash" size={16} color={theme.error} />
@@ -194,9 +152,7 @@ export const MotorcycleListScreen: React.FC<MotorcycleListScreenProps> = ({ navi
 
   const renderEmptyState = () => (
     <View style={styles.emptyState}>
-      <View
-        style={[styles.emptyIcon, { backgroundColor: `${theme.primary}20` }]}
-      >
+      <View style={[styles.emptyIcon, { backgroundColor: `${theme.primary}20` }]}>
         <Ionicons name="bicycle" size={48} color={theme.primary} />
       </View>
       <Text style={[styles.emptyTitle, { color: theme.text }]}>
@@ -234,12 +190,7 @@ export const MotorcycleListScreen: React.FC<MotorcycleListScreenProps> = ({ navi
 
       {/* Search */}
       <View style={styles.searchContainer}>
-        <View
-          style={[
-            styles.searchInputContainer,
-            { backgroundColor: theme.surface, borderColor: theme.border },
-          ]}
-        >
+        <View style={[styles.searchInputContainer, { backgroundColor: theme.surface, borderColor: theme.border }]}>
           <Ionicons name="search" size={20} color={theme.textSecondary} />
           <TextInput
             style={[styles.searchInput, { color: theme.text }]}
@@ -259,10 +210,7 @@ export const MotorcycleListScreen: React.FC<MotorcycleListScreenProps> = ({ navi
       {/* Stats */}
       <View style={styles.statsContainer}>
         <Text style={[styles.statsText, { color: theme.textSecondary }]}>
-          {filteredMotorcycles.length}{" "}
-          {filteredMotorcycles.length === 1
-            ? "moto encontrada"
-            : "motos encontradas"}
+          {filteredMotorcycles.length} {filteredMotorcycles.length === 1 ? "moto encontrada" : "motos encontradas"}
         </Text>
       </View>
 
@@ -273,9 +221,7 @@ export const MotorcycleListScreen: React.FC<MotorcycleListScreenProps> = ({ navi
         keyExtractor={(item: any) => String(item.id)}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-        }
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
         ListEmptyComponent={renderEmptyState}
       />
     </SafeAreaView>
