@@ -1,8 +1,6 @@
-# Mottu Mobile - Gerenciador de Motos
+# Motorcycle Manager
 
-Projeto desenvolvido para a disciplina **Mobile Application Development** – 2º Semestre de 2025.
-
-Este aplicativo simula o gerenciamento de motos em pátios de aluguel, inspirado visualmente no site da [Mottu](https://mottu.com.br).
+Aplicativo React Native com Expo para gerenciamento de motocicletas.
 
 ---
 
@@ -14,47 +12,114 @@ Este aplicativo simula o gerenciamento de motos em pátios de aluguel, inspirado
 
 ---
 
-## Tecnologias e bibliotecas utilizadas
+## 🚀 Funcionalidades
 
-- [React Native](https://reactnative.dev/)
-- [Expo](https://expo.dev/)
-- [React Navigation](https://reactnavigation.org/)
-- [AsyncStorage](https://react-native-async-storage.github.io/async-storage/)
-- [UUID](https://www.npmjs.com/package/uuid)
+- ✅ **Autenticação Firebase** - Login e cadastro de usuários
+- ✅ **Dashboard Home** - Visão geral com estatísticas e ações rápidas
+- ✅ **Cadastro de Motos** - Formulário para adicionar motos (modelo, placa, fabricante)
+- ✅ **Lista com CRUD** - Visualizar, editar, excluir e buscar motos
+- ✅ **Configurações** - Alternância entre tema claro/escuro
+- ✅ **AsyncStorage** - Armazenamento local das motos
+- ✅ **Design Moderno** - Interface com cores verde e preto
 
----
+## 🛠️ Tecnologias
 
-## Funcionalidades implementadas
+- React Native
+- Expo
+- TypeScript
+- Firebase Authentication
+- AsyncStorage
+- React Navigation
+- Expo Vector Icons
 
-✅ Navegação entre telas  
-✅ Cadastro e listagem de motos  
-✅ Formulário com manipulação de estado  
-✅ Armazenamento local com `AsyncStorage`  
-✅ Visual customizado inspirado na Mottu  
-✅ Exibição de logo nas telas  
-✅ Barra de navegação personalizada (cor preta com texto branco)
+## 📱 Como executar
 
----
+1. **Clone ou baixe o projeto**
+2. **Instale as dependências:**
+   \`\`\`bash
+   npm install
+   # ou
+   expo install
+   \`\`\`
 
-## Telas
+3. **Configure o Firebase:**
+   - Crie um projeto no [Firebase Console](https://console.firebase.google.com/)
+   - Ative a autenticação por email/senha
+   - Substitua as configurações em `src/config/firebase.ts`
 
-- Tela inicial (Home)
-- Lista de Motos
-- Cadastro de Moto
-- Detalhes da Moto
-- Tela de Configurações (limpa os dados)
+4. **Execute o projeto:**
+   \`\`\`bash
+   npx expo start
+   \`\`\`
 
----
+5. **Teste no dispositivo:**
+   - Instale o Expo Go no seu Android
+   - Escaneie o QR code gerado
 
-## ▶Como executar
+## 🎨 Design
 
-1. Clone este repositório:
-git clone [https://github.com/GuGoulart/EntregraMobileSprint1](https://github.com/GuGoulart/EntregraMobileSprint1)
+O aplicativo utiliza um sistema de cores moderno:
+- **Primary:** Verde (#10B981)
+- **Secondary:** Verde escuro (#059669)
+- **Suporte completo a tema claro/escuro**
+- **Interface responsiva e acessível**
 
-2. Instale as dependências
-npm install
+## 📁 Estrutura do Projeto
 
-3. Rode o projeto com
-npx expo start
+\`\`\`
+src/
+├── components/          # Componentes reutilizáveis
+├── contexts/           # Contextos (Auth, Theme)
+├── screens/            # Telas do aplicativo
+├── services/           # Serviços (AsyncStorage)
+├── types/              # Tipos TypeScript
+└── config/             # Configurações (Firebase)
+\`\`\`
 
-4. Use no navegador ou escaneie o QR code com o app do Expo Go.
+## 🔧 Configuração do Firebase
+
+Substitua as configurações em `src/config/firebase.ts`:
+
+\`\`\`typescript
+const firebaseConfig = {
+  apiKey: "sua-api-key",
+  authDomain: "seu-projeto.firebaseapp.com",
+  projectId: "seu-projeto-id",
+  storageBucket: "seu-projeto.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "seu-app-id"
+};
+\`\`\`
+
+## 📱 Telas do Aplicativo
+
+1. **Login/Cadastro** - Autenticação de usuários
+2. **Home** - Dashboard com estatísticas e ações rápidas
+3. **Cadastrar Moto** - Formulário de cadastro
+4. **Lista de Motos** - CRUD completo com busca
+5. **Configurações** - Alternância de tema e informações da conta
+
+## 🎯 Funcionalidades Detalhadas
+
+### Cadastro de Motos
+- Campos: Modelo, Placa, Fabricante
+- Validação de placa brasileira
+- Sugestões de fabricantes populares
+- Armazenamento local com AsyncStorage
+
+### Lista de Motos
+- Visualização em cards
+- Busca por modelo, placa ou fabricante
+- Edição inline
+- Exclusão com confirmação
+- Pull-to-refresh
+
+### Configurações
+- Alternância tema claro/escuro
+- Informações da conta
+- Sobre o aplicativo
+- Logout seguro
+
+## 📄 Licença
+
+Este projeto foi criado para fins educacionais e de demonstração.
