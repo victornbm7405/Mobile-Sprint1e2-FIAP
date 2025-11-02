@@ -1,93 +1,110 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState } from "react"
-import { View, Text, StyleSheet, SafeAreaView, KeyboardAvoidingView, Platform, ScrollView, Alert } from "react-native"
-import { useTheme } from "../contexts/ThemeContext"
-import { useAuth } from "../contexts/AuthContext"
-import { CustomButton } from "../components/CustomButton"
-import { CustomInput } from "../components/CustomInput"
+import type React from "react";
+import { useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Alert,
+} from "react-native";
+import { useTheme } from "../contexts/ThemeContext";
+import { useAuth } from "../contexts/AuthContext";
+import { CustomButton } from "../components/CustomButton";
+import { CustomInput } from "../components/CustomInput";
 
 export const AuthScreen: React.FC = () => {
-  const { theme } = useTheme()
-  const { signIn, signUp } = useAuth()
-  const [isLogin, setIsLogin] = useState(true)
-  const [loading, setLoading] = useState(false)
+  const { theme } = useTheme();
+  const { login } = useAuth(); // <- usamos a API do backend via AuthContext
+  const [isLogin, setIsLogin] = useState(true);
+  const [loading, setLoading] = useState(false);
+
+  // Agora usamos username (o backend espera username/senha)
   const [formData, setFormData] = useState({
-    email: "",
+    username: "",
     password: "",
     confirmPassword: "",
-  })
-  const [errors, setErrors] = useState<{ [key: string]: string }>({})
+  });
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const validateForm = () => {
-    const newErrors: { [key: string]: string } = {}
+    const newErrors: { [key: string]: string } = {};
 
-    if (!formData.email) {
-      newErrors.email = "Email é obrigatório"
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Email inválido"
+    if (!formData.username) {
+      newErrors.username = "Usuário é obrigatório";
     }
 
     if (!formData.password) {
-      newErrors.password = "Senha é obrigatória"
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Senha deve ter pelo menos 6 caracteres"
+      newErrors.password = "Senha é obrigatória";
+    } else if (formData.password.length < 3) {
+      // simples, só pra evitar vazio
+      newErrors.password = "Senha deve ter pelo menos 3 caracteres";
     }
 
     if (!isLogin && formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Senhas não coincidem"
+      newErrors.confirmPassword = "Senhas não coincidem";
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async () => {
-    if (!validateForm()) return
+    if (!validateForm()) return;
 
-    setLoading(true)
+    setLoading(true);
     try {
       if (isLogin) {
-        await signIn(formData.email, formData.password)
+        await login(formData.username, formData.password);
       } else {
-        await signUp(formData.email, formData.password)
+        // Sem endpoint de cadastro no backend neste momento
+        Alert.alert("Aviso", "Cadastro desativado no momento. Use a opção de login.");
       }
     } catch (error: any) {
-      Alert.alert("Erro", error.message || "Ocorreu um erro inesperado")
+      Alert.alert("Erro", error?.message || "Não foi possível entrar");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const toggleMode = () => {
-    setIsLogin(!isLogin)
-    setErrors({})
-    setFormData({ email: "", password: "", confirmPassword: "" })
-  }
+    setIsLogin(!isLogin);
+    setErrors({});
+    setFormData({ username: "", password: "", confirmPassword: "" });
+  };
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.keyboardView}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.keyboardView}
+      >
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={styles.header}>
             <View style={[styles.logoContainer, { backgroundColor: theme.primary }]}>
               <Text style={styles.logoText}>M</Text>
             </View>
-            <Text style={[styles.title, { color: theme.text }]}>{isLogin ? "Bem-vindo de volta" : "Criar conta"}</Text>
+            <Text style={[styles.title, { color: theme.text }]}>
+              {isLogin ? "Bem-vindo de volta" : "Criar conta"}
+            </Text>
             <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
-              {isLogin ? "Faça login para gerenciar suas motos" : "Cadastre-se para começar a gerenciar suas motos"}
+              {isLogin
+                ? "Faça login para gerenciar suas motos"
+                : "Cadastre-se para começar a gerenciar suas motos"}
             </Text>
           </View>
 
           <View style={styles.form}>
             <CustomInput
-              label="Email"
-              value={formData.email}
-              onChangeText={(text) => setFormData({ ...formData, email: text })}
-              placeholder="seu@email.com"
-              keyboardType="email-address"
-              error={errors.email}
+              label="Usuário"
+              value={formData.username}
+              onChangeText={(text) => setFormData({ ...formData, username: text })}
+              placeholder="admin"
+              error={errors.username}
             />
 
             <CustomInput
@@ -110,7 +127,11 @@ export const AuthScreen: React.FC = () => {
               />
             )}
 
-            <CustomButton title={isLogin ? "Entrar" : "Cadastrar"} onPress={handleSubmit} loading={loading} />
+            <CustomButton
+              title={isLogin ? "Entrar" : "Cadastrar"}
+              onPress={handleSubmit}
+              loading={loading}
+            />
 
             <CustomButton
               title={isLogin ? "Não tem conta? Cadastre-se" : "Já tem conta? Faça login"}
@@ -121,9 +142,10 @@ export const AuthScreen: React.FC = () => {
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
-  )
-}
+  );
+};
 
+// ⚠️ CSS inalterado:
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -167,4 +189,4 @@ const styles = StyleSheet.create({
   form: {
     gap: 16,
   },
-})
+});

@@ -42,7 +42,6 @@ export const EditMotorcycleScreen: React.FC = () => {
 
   const [loading, setLoading] = useState(false)
 
-  // mesmo shape da tela de cadastro
   const [formData, setFormData] = useState({
     modelo: current?.modelo ?? "",
     placa: current?.placa ?? "",
@@ -50,7 +49,6 @@ export const EditMotorcycleScreen: React.FC = () => {
   })
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
 
-  // Áreas (mesmo componente visual/chips)
   const [areas, setAreas] = useState<Area[]>([])
   useEffect(() => {
     ;(async () => {
@@ -58,7 +56,7 @@ export const EditMotorcycleScreen: React.FC = () => {
         const list = await listAreas()
         setAreas(list)
       } catch {
-        // se falhar, ainda dá pra tentar salvar; apenas sem nomes de áreas
+        // segue sem nomes se falhar
       }
     })()
   }, [])
@@ -66,9 +64,7 @@ export const EditMotorcycleScreen: React.FC = () => {
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {}
 
-    if (!formData.modelo.trim()) {
-      newErrors.modelo = "Modelo é obrigatório"
-    }
+    if (!formData.modelo.trim()) newErrors.modelo = "Modelo é obrigatório"
 
     if (!formData.placa.trim()) {
       newErrors.placa = "Placa é obrigatória"
@@ -76,9 +72,7 @@ export const EditMotorcycleScreen: React.FC = () => {
       newErrors.placa = "Formato de placa inválido (ex: ABC1234 ou ABC1D23)"
     }
 
-    if (!formData.areaId) {
-      newErrors.areaId = "Selecione uma área"
-    }
+    if (!formData.areaId) newErrors.areaId = "Selecione uma área"
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -101,7 +95,7 @@ export const EditMotorcycleScreen: React.FC = () => {
       Alert.alert("Sucesso", "Moto atualizada com sucesso!", [
         { text: "OK", onPress: () => navigation.goBack() },
       ])
-    } catch (e) {
+    } catch {
       Alert.alert("Erro", "Não foi possível atualizar a moto. Tente novamente.")
     } finally {
       setLoading(false)
@@ -110,21 +104,15 @@ export const EditMotorcycleScreen: React.FC = () => {
 
   const formatPlaca = (text: string) => {
     const cleaned = text.replace(/[^A-Z0-9]/g, "").toUpperCase()
-    if (cleaned.length <= 3) {
-      return cleaned
-    } else if (cleaned.length <= 4) {
-      return `${cleaned.slice(0, 3)}-${cleaned.slice(3)}`
-    } else if (cleaned.length <= 7) {
-      return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 4)}${cleaned.slice(4, 5)}${cleaned.slice(5)}`
-    } else {
-      return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 4)}${cleaned.slice(4, 5)}${cleaned.slice(5, 7)}`
-    }
+    if (cleaned.length <= 3) return cleaned
+    if (cleaned.length <= 4) return `${cleaned.slice(0, 3)}-${cleaned.slice(3)}`
+    if (cleaned.length <= 7) return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 4)}${cleaned.slice(4, 5)}${cleaned.slice(5)}`
+    return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 4)}${cleaned.slice(4, 5)}${cleaned.slice(5, 7)}`
   }
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.keyboardView}>
-        {/* Header idêntico ao de cadastro */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
             <Ionicons name="arrow-back" size={24} color={theme.text} />
@@ -134,7 +122,6 @@ export const EditMotorcycleScreen: React.FC = () => {
         </View>
 
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          {/* Icon */}
           <View style={styles.iconContainer}>
             <View style={[styles.iconCircle, { backgroundColor: `${theme.primary}20` }]}>
               <Ionicons name="bicycle" size={48} color={theme.primary} />
@@ -142,7 +129,6 @@ export const EditMotorcycleScreen: React.FC = () => {
             <Text style={[styles.iconText, { color: theme.textSecondary }]}>Atualize os dados da sua moto</Text>
           </View>
 
-          {/* Form (mesmos componentes e estilos) */}
           <View style={styles.form}>
             <CustomInput
               label="Modelo"
@@ -160,7 +146,6 @@ export const EditMotorcycleScreen: React.FC = () => {
               error={errors.placa}
             />
 
-            {/* Seleção de Área (chips) */}
             <View>
               <Text style={[styles.suggestionsTitle, { color: theme.textSecondary }]}>Selecione a Área *</Text>
               {errors.areaId ? (

@@ -1,30 +1,29 @@
-﻿// src/services/motorcycleService.ts
-import { API_BASE } from "./config"
+﻿import { tryPaths } from "./rest";
 
 export type Motorcycle = {
-  id: string | number
-  modelo: string
-  placa: string
-  createdAt?: string
-  areaId?: number
-  areaNome?: string
-}
+  id: string | number;
+  modelo: string;
+  placa: string;
+  createdAt?: string;
+  areaId?: number;
+  areaNome?: string;
+};
 
 type ServerMoto = {
-  id: number
-  placa: string
-  modelo: string
-  idArea: number
-  createdAt?: string
-}
+  id: number;
+  placa: string;
+  modelo: string;
+  idArea: number;
+  createdAt?: string;
+};
 
 type Page<T> = {
-  total: number
-  page: number
-  pageSize: number
-  items: T[]
-  _links?: any
-}
+  total: number;
+  page: number;
+  pageSize: number;
+  items: T[];
+  _links?: any;
+};
 
 function normalize(m: ServerMoto): Motorcycle {
   return {
@@ -33,121 +32,83 @@ function normalize(m: ServerMoto): Motorcycle {
     modelo: m.modelo,
     areaId: m.idArea,
     createdAt: m.createdAt ?? new Date().toISOString(),
-  }
+  };
 }
 
 function isServerMoto(x: any): x is ServerMoto {
-  return x && typeof x === "object" && "id" in x && "placa" in x && "modelo" in x && "idArea" in x
+  return x && typeof x === "object" && "id" in x && "placa" in x && "modelo" in x && "idArea" in x;
 }
 
-// remove tudo que não é A–Z/0–9 e deixa maiúsculo
 function sanitizePlaca(p: string): string {
-  return (p ?? "").replace(/[^A-Z0-9]/gi, "").toUpperCase()
+  return (p ?? "").replace(/[^A-Z0-9]/gi, "").toUpperCase();
 }
 
-// alguns endpoints retornam envelope { data: {...}, _links: ... }
 function unwrapMaybeEnvelope(json: any): any {
-  if (json && typeof json === "object" && "data" in json && isServerMoto(json.data)) {
-    return json.data
-  }
-  if (isServerMoto(json)) return json
-  // às vezes vem { resource } ou { item } — cobre também:
-  if (json?.resource && isServerMoto(json.resource)) return json.resource
-  if (json?.item && isServerMoto(json.item)) return json.item
-  if (Array.isArray(json) && json.length && isServerMoto(json[0])) return json[0]
-  return null
+  if (json && typeof json === "object" && "data" in json && isServerMoto(json.data)) return json.data;
+  if (isServerMoto(json)) return json;
+  if (json?.resource && isServerMoto(json.resource)) return json.resource;
+  if (json?.item && isServerMoto(json.item)) return json.item;
+  if (Array.isArray(json) && json.length && isServerMoto(json[0])) return json[0];
+  return null;
 }
 
 async function getAll(): Promise<Motorcycle[]> {
-  const url = `${API_BASE}/api/Motos?page=1&pageSize=1000`
-  const r = await fetch(url)
-  if (!r.ok) {
-    const t = await r.text().catch(() => "")
-    throw new Error(`Falha ao listar motos: ${r.status} ${t}`)
-  }
-  const data = await r.json()
-  if (Array.isArray(data)) return (data as ServerMoto[]).map(normalize)
-  const page = data as Page<ServerMoto>
-  return (page.items ?? []).map(normalize)
+  const res = await tryPaths([
+    "/api/v1/Motos?page=1&pageSize=1000",
+    "/api/Motos?page=1&pageSize=1000",
+  ]);
+  const data = await res.json().catch(() => null);
+  if (Array.isArray(data)) return (data as ServerMoto[]).map(normalize);
+  const page = (data ?? {}) as Page<ServerMoto>;
+  return (page.items ?? []).map(normalize);
 }
 
 async function save(m: { modelo: string; placa: string; areaId: number }): Promise<Motorcycle> {
-  const body = {
-    modelo: m.modelo,
-    placa: sanitizePlaca(m.placa),
-    idArea: m.areaId,
-  }
-  const r = await fetch(`${API_BASE}/api/Motos`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  })
-  if (!(r.status === 200 || r.status === 201)) {
-    const t = await r.text().catch(() => "")
-    throw new Error(`Falha ao criar moto: ${r.status} ${t}`)
-  }
+  const body = { modelo: m.modelo, placa: sanitizePlaca(m.placa), idArea: m.areaId };
+  const res = await tryPaths(
+    ["/api/v1/Motos", "/api/Motos"],
+    { method: "POST", body: JSON.stringify(body) }
+  );
+
   try {
-    const json = await r.json().catch(() => null)
-    const unwrapped = unwrapMaybeEnvelope(json)
-    if (unwrapped) return normalize(unwrapped as ServerMoto)
+    const json = await res.json().catch(() => null);
+    const unwrapped = unwrapMaybeEnvelope(json);
+    if (unwrapped) return normalize(unwrapped as ServerMoto);
   } catch {}
-  // fallback: sem body/envelope desconhecido
-  return {
-    id: "temp",
-    modelo: body.modelo,
-    placa: body.placa,
-    areaId: body.idArea,
-    createdAt: new Date().toISOString(),
-  }
+  return { id: "temp", modelo: body.modelo, placa: body.placa, areaId: body.idArea, createdAt: new Date().toISOString() };
 }
 
 async function update(id: string | number, m: Partial<Motorcycle>): Promise<Motorcycle> {
-  // Backend exige ID no path e também no body
-  const idNum = Number(id)
+  const idNum = Number(id);
   const body: any = {
     id: idNum,
     modelo: m.modelo,
     placa: m.placa != null ? sanitizePlaca(m.placa) : undefined,
     idArea: m.areaId,
-  }
+  };
 
-  const r = await fetch(`${API_BASE}/api/Motos/${idNum}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  })
-
-  if (!r.ok) {
-    const t = await r.text().catch(() => "")
-    throw new Error(`Falha ao atualizar moto: ${r.status} ${t}`)
-  }
+  const res = await tryPaths(
+    [`/api/v1/Motos/${idNum}`, `/api/Motos/${idNum}`],
+    { method: "PUT", body: JSON.stringify(body) }
+  );
 
   try {
-    const json = await r.json().catch(() => null)
-    const unwrapped = unwrapMaybeEnvelope(json)
-    if (unwrapped) return normalize(unwrapped as ServerMoto)
+    const json = await res.json().catch(() => null);
+    const unwrapped = unwrapMaybeEnvelope(json);
+    if (unwrapped) return normalize(unwrapped as ServerMoto);
   } catch {}
-  // fallback: sem body/envelope desconhecido
-  return {
-    id: idNum,
-    modelo: body.modelo,
-    placa: body.placa,
-    areaId: body.idArea,
-    createdAt: new Date().toISOString(),
-  }
+  return { id: idNum, modelo: body.modelo, placa: body.placa, areaId: body.idArea, createdAt: new Date().toISOString() };
 }
 
 async function remove(id: string | number): Promise<void> {
-  const r = await fetch(`${API_BASE}/api/Motos/${id}`, { method: "DELETE" })
-  if (!r.ok) {
-    const t = await r.text().catch(() => "")
-    throw new Error(`Falha ao excluir moto: ${r.status} ${t}`)
+  const res = await tryPaths(
+    [`/api/v1/Motos/${id}`, `/api/Motos/${id}`],
+    { method: "DELETE" }
+  );
+  if (!res.ok && res.status !== 204) {
+    const t = await res.text().catch(() => "");
+    throw new Error(`Falha ao excluir moto: ${res.status} ${t}`);
   }
 }
 
-export const motorcycleService = {
-  getAll,
-  save,
-  update,
-  delete: remove,
-}
+export const motorcycleService = { getAll, save, update, delete: remove };
