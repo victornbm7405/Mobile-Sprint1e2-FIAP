@@ -15,6 +15,11 @@ import { EditMotorcycleScreen } from "./src/screens/EditMotorcycleScreen"
 import { SettingsScreen } from "./src/screens/SettingsScreen"
 import { ActivityIndicator, View } from "react-native"
 
+// ▼ NOVAS TELAS (import default e caminho singular)
+import UserListScreen from "./src/screens/UserListScreen"
+import AddUserScreen from "./src/screens/AddUserScreen"
+import EditUserScreen from "./src/screens/EditUserScreen"
+
 const Stack = createStackNavigator()
 const Tab = createBottomTabNavigator()
 
@@ -32,6 +37,8 @@ const TabNavigator = () => {
             iconName = focused ? "home" : "home-outline"
           } else if (route.name === "MotorcycleList") {
             iconName = focused ? "list" : "list-outline"
+          } else if (route.name === "UsersList") {
+            iconName = focused ? "people" : "people-outline"
           } else if (route.name === "AddMotorcycle") {
             iconName = focused ? "add-circle" : "add-circle-outline"
           } else if (route.name === "Settings") {
@@ -59,6 +66,7 @@ const TabNavigator = () => {
     >
       <Tab.Screen name="Home" component={HomeScreen} options={{ tabBarLabel: "Início" }} />
       <Tab.Screen name="MotorcycleList" component={MotorcycleListScreen} options={{ tabBarLabel: "Motos" }} />
+      <Tab.Screen name="UsersList" component={UserListScreen} options={{ tabBarLabel: "Usuários" }} />
       <Tab.Screen name="AddMotorcycle" component={AddMotorcycleScreen} options={{ tabBarLabel: "Cadastrar" }} />
       <Tab.Screen name="Settings" component={SettingsScreen} options={{ tabBarLabel: "Config" }} />
     </Tab.Navigator>
@@ -84,6 +92,9 @@ const AppNavigator = () => {
           <>
             <Stack.Screen name="Main" component={TabNavigator} />
             <Stack.Screen name="EditMotorcycle" component={EditMotorcycleScreen} />
+            {/* ▼ Rotas adicionais de usuário */}
+            <Stack.Screen name="AddUser" component={AddUserScreen} />
+            <Stack.Screen name="EditUser" component={EditUserScreen} />
           </>
         ) : (
           <Stack.Screen name="Auth" component={AuthScreen} />
