@@ -1,4 +1,6 @@
 ﻿// src/screens/MotorcycleFormScreen.tsx
+"use client";
+
 import type React from "react";
 import { useEffect, useState } from "react";
 import {
@@ -14,10 +16,9 @@ import {
 import { RouteProp, useRoute, useNavigation } from "@react-navigation/native";
 import type { Area } from "../services/areaService";
 import { listAreas } from "../services/areaService";
-
-// NOTE: mantenha seus serviços existentes de criar/atualizar moto.
-// Aqui estão nomes genéricos; use os seus se diferente:
 import { createMotorcycle, updateMotorcycle } from "../services/motorcycleService";
+import { useTranslation } from "react-i18next";
+import { useTheme } from "../contexts/ThemeContext";
 
 // Se você já tem um tipo Motorcycle, mantenha-o.
 // Precisamos apenas garantir que exista areaId na entidade.
@@ -36,6 +37,8 @@ type R = RouteProp<ParamList, "MotorcycleForm">;
 export default function MotorcycleFormScreen() {
   const route = useRoute<R>();
   const navigation = useNavigation<any>();
+  const { t } = useTranslation();
+  const { theme } = useTheme();
 
   const editingId = route.params?.id;
   const [areas, setAreas] = useState<Area[]>([]);
@@ -52,7 +55,9 @@ export default function MotorcycleFormScreen() {
         const a = await listAreas();
         setAreas(a);
       } catch (e) {
-        // opcional: Alert.alert("Erro", "Não foi possível carregar áreas");
+        // opcional:
+        // Alert.alert(t("motorcycleForm.alert.errorTitle", { defaultValue: "Erro" }),
+        //             t("motorcycleForm.alert.areasLoadFailed", { defaultValue: "Não foi possível carregar áreas" }));
       }
     })();
   }, []);
@@ -60,7 +65,12 @@ export default function MotorcycleFormScreen() {
   async function onSave() {
     // Mantém as mesmas validações que você já tinha; apenas exigimos área:
     if (!form.placa?.trim() || !form.modelo?.trim() || !form.areaId) {
-      Alert.alert("Campos obrigatórios", "Informe Placa, Modelo e Área.");
+      Alert.alert(
+        t("motorcycleForm.alert.requiredTitle", { defaultValue: "Campos obrigatórios" }),
+        t("motorcycleForm.alert.requiredMessage", {
+          defaultValue: "Informe Placa, Modelo e Área.",
+        })
+      );
       return;
     }
     try {
@@ -82,45 +92,54 @@ export default function MotorcycleFormScreen() {
       }
       navigation.goBack();
     } catch (e: any) {
-      Alert.alert("Erro", e?.message ?? "Falha ao salvar");
+      Alert.alert(
+        t("motorcycleForm.alert.errorTitle", { defaultValue: "Erro" }),
+        e?.message ?? t("motorcycleForm.alert.saveFailed", { defaultValue: "Falha ao salvar" })
+      );
     }
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={styles.form}>
         {/* --- CAMPO PLACA (inalterado) --- */}
-        <Text style={styles.label}>Placa *</Text>
+        <Text style={styles.label}>
+          {t("motorcycleForm.fields.plate.label", { defaultValue: "Placa *" })}
+        </Text>
         <TextInput
           value={form.placa}
-          onChangeText={(t) => setForm((f) => ({ ...f, placa: t }))}
-          placeholder="ABC1D23"
+          onChangeText={(t1) => setForm((f) => ({ ...f, placa: t1 }))}
+          placeholder={t("motorcycleForm.fields.plate.placeholder", { defaultValue: "ABC1D23" })}
           style={styles.input}
         />
 
         {/* --- CAMPO MODELO (inalterado) --- */}
-        <Text style={styles.label}>Modelo *</Text>
+        <Text style={styles.label}>
+          {t("motorcycleForm.fields.model.label", { defaultValue: "Modelo *" })}
+        </Text>
         <TextInput
           value={form.modelo}
-          onChangeText={(t) => setForm((f) => ({ ...f, modelo: t }))}
-          placeholder="CG 160"
+          onChangeText={(t2) => setForm((f) => ({ ...f, modelo: t2 }))}
+          placeholder={t("motorcycleForm.fields.model.placeholder", { defaultValue: "CG 160" })}
           style={styles.input}
         />
 
         {/* --- CAMPO ANO (se você já tinha, mantemos) --- */}
-        <Text style={styles.label}>Ano</Text>
+        <Text style={styles.label}>
+          {t("motorcycleForm.fields.year.label", { defaultValue: "Ano" })}
+        </Text>
         <TextInput
           value={form.ano ? String(form.ano) : ""}
-          onChangeText={(t) =>
-            setForm((f) => ({ ...f, ano: t ? Number(t) : undefined }))
-          }
-          placeholder="2022"
+          onChangeText={(t3) => setForm((f) => ({ ...f, ano: t3 ? Number(t3) : undefined }))}
+          placeholder={t("motorcycleForm.fields.year.placeholder", { defaultValue: "2022" })}
           keyboardType="numeric"
           style={styles.input}
         />
 
         {/* >>>>> AQUI ENTRA O QUE SUBSTITUI “FABRICANTES POPULARES” <<<<< */}
-        <Text style={styles.label}>Áreas *</Text>
+        <Text style={styles.label}>
+          {t("motorcycleForm.fields.areas.label", { defaultValue: "Áreas *" })}
+        </Text>
         <FlatList
           horizontal
           data={areas}
@@ -133,11 +152,7 @@ export default function MotorcycleFormScreen() {
                 onPress={() => setForm((f) => ({ ...f, areaId: item.id }))}
                 style={[styles.pill, active && styles.pillActive]}
               >
-                <Text
-                  style={[styles.pillText, active && styles.pillTextActive]}
-                >
-                  {item.nome}
-                </Text>
+                <Text style={[styles.pillText, active && styles.pillTextActive]}>{item.nome}</Text>
               </TouchableOpacity>
             );
           }}
@@ -147,7 +162,9 @@ export default function MotorcycleFormScreen() {
         />
 
         <TouchableOpacity style={styles.save} onPress={onSave}>
-          <Text style={styles.saveText}>Salvar</Text>
+          <Text style={styles.saveText}>
+            {t("motorcycleForm.actions.save", { defaultValue: "Salvar" })}
+          </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

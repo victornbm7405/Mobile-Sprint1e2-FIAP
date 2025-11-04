@@ -1,0 +1,360 @@
+{
+  "app": {
+    "logo": {
+      "letter": "M"
+    }
+  },
+  "common": {
+    "ok": "OK",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "success": "Éxito",
+    "error": "Error",
+    "save": "Guardar"
+  },
+  "tabs": {
+    "home": "Inicio"
+  },
+  "home": {
+    "greeting": {
+      "morning": "Buenos días",
+      "afternoon": "Buenas tardes",
+      "evening": "Buenas noches"
+    },
+    "user": {
+      "fallbackName": "Usuario"
+    },
+    "actions": {
+      "create": {
+        "title": "Registrar Moto",
+        "subtitle": "Agregar nueva moto"
+      },
+      "list": {
+        "title": "Mis Motos",
+        "subtitle": "Ver todas las motos"
+      },
+      "settings": {
+        "title": "Configuración",
+        "subtitle": "Personalizar app"
+      },
+      "seeAll": "Ver todas"
+    },
+    "stats": {
+      "registered": "Motos Registradas",
+      "brands": "Fabricantes"
+    },
+    "sections": {
+      "quickActions": "Acciones Rápidas",
+      "recent": "Motos Recientes"
+    },
+    "empty": {
+      "title": "Ninguna moto registrada",
+      "subtitle": "Empieza agregando tu primera moto",
+      "button": "Registrar Moto"
+    },
+    "errors": {
+      "load": "Error al cargar motos:"
+    }
+  },
+  "motoAdd": {
+    "title": "Registrar Moto",
+    "subtitle": "Completa los datos de tu moto",
+    "model": {
+      "label": "Modelo",
+      "placeholder": "Ej.: CB 600F Hornet"
+    },
+    "plate": {
+      "label": "Matrícula",
+      "placeholder": "ABC-1234"
+    },
+    "area": {
+      "label": "Selecciona el Área *"
+    },
+    "errors": {
+      "modelRequired": "El modelo es obligatorio",
+      "plateRequired": "La matrícula es obligatoria",
+      "plateInvalid": "Formato de matrícula inválido (p. ej., ABC1234 o ABC1D23)",
+      "areaRequired": "Selecciona un área"
+    },
+    "submit": "Registrar Moto",
+    "cancel": "Cancelar",
+    "alert": {
+      "successTitle": "Éxito",
+      "successMessage": "¡Moto registrada con éxito!",
+      "errorTitle": "Error",
+      "errorMessage": "No fue posible registrar la moto. Inténtalo de nuevo."
+    }
+  },
+  "auth": {
+    "title": {
+      "login": "Bienvenido de nuevo",
+      "register": "Crear cuenta"
+    },
+    "subtitle": {
+      "login": "Inicia sesión para gestionar tus motos",
+      "register": "Regístrate para empezar a gestionar tus motos"
+    },
+    "username": {
+      "label": "Usuario",
+      "placeholder": "admin"
+    },
+    "password": {
+      "label": "Contraseña",
+      "placeholder": "Tu contraseña"
+    },
+    "confirmPassword": {
+      "label": "Confirmar contraseña",
+      "placeholder": "Confirma tu contraseña"
+    },
+    "buttons": {
+      "login": "Iniciar sesión",
+      "register": "Registrarse",
+      "toRegister": "¿No tienes cuenta? Regístrate",
+      "toLogin": "¿Ya tienes cuenta? Inicia sesión"
+    },
+    "errors": {
+      "usernameRequired": "El nombre de usuario es obligatorio",
+      "passwordRequired": "La contraseña es obligatoria",
+      "passwordMin": "La contraseña debe tener al menos 3 caracteres",
+      "passwordMismatch": "Las contraseñas no coinciden"
+    },
+    "alert": {
+      "warnTitle": "Aviso",
+      "signupDisabled": "El registro está desactivado por el momento. Usa la opción de inicio de sesión.",
+      "errorTitle": "Error",
+      "genericError": "No fue posible iniciar sesión"
+    }
+  },
+  "moto": {
+    "edit": {
+      "title": "Editar Moto",
+      "subtitle": "Actualiza los datos de tu moto"
+    },
+    "form": {
+      "model": {
+        "label": "Modelo",
+        "placeholder": "Ej.: CB 600F Hornet"
+      },
+      "plate": {
+        "label": "Matrícula",
+        "placeholder": "ABC-1234"
+      },
+      "area": {
+        "label": "Selecciona el Área *",
+        "required": "Selecciona un área"
+      }
+    },
+    "buttons": {
+      "saveChanges": "Guardar cambios"
+    },
+    "alert": {
+      "success": {
+        "title": "Éxito",
+        "updated": "¡Moto actualizada con éxito!"
+      },
+      "error": {
+        "title": "Error",
+        "invalidRecord": "Registro inválido para edición.",
+        "updateFailed": "No fue posible actualizar la moto. Inténtalo de nuevo."
+      }
+    }
+  },
+  "errors": {
+    "modelRequired": "El modelo es obligatorio",
+    "plateRequired": "La matrícula es obligatoria",
+    "plateInvalid": "Formato de matrícula inválido (p. ej., ABC1234 o ABC1D23)"
+  },
+  "userAdd": {
+    "title": "Registrar Usuario",
+    "subtitle": "Completa los datos del usuario",
+    "name": {
+      "label": "Nombre",
+      "placeholder": "Nombre completo"
+    },
+    "email": {
+      "label": "Correo electrónico",
+      "placeholder": "usuario@email.com"
+    },
+    "username": {
+      "label": "Usuario",
+      "placeholder": "victor"
+    },
+    "password": {
+      "label": "Contraseña",
+      "placeholder": "mín. 6 caracteres"
+    },
+    "role": {
+      "label": "Perfil *"
+    },
+    "roles": {
+      "User": "User",
+      "Admin": "Admin"
+    },
+    "submit": "Registrar",
+    "cancel": "Cancelar",
+    "errors": {
+      "nameRequired": "El nombre es obligatorio",
+      "emailRequired": "El correo electrónico es obligatorio",
+      "emailInvalid": "Correo electrónico inválido",
+      "usernameRequired": "El nombre de usuario es obligatorio",
+      "passwordMin": "La contraseña debe tener 6+ caracteres"
+    },
+    "alert": {
+      "successTitle": "Éxito",
+      "successMessage": "¡Usuario creado!",
+      "errorTitle": "Error",
+      "errorMessage": "Fallo al crear usuario"
+    }
+  },
+  "userEdit": {
+    "title": "Editar Usuario",
+    "subtitle": "Actualiza los datos del usuario",
+    "name": {
+      "label": "Nombre",
+      "placeholder": "Nombre completo"
+    },
+    "email": {
+      "label": "Correo electrónico",
+      "placeholder": "usuario@email.com"
+    },
+    "username": {
+      "label": "Usuario",
+      "placeholder": "victor"
+    },
+    "password": {
+      "label": "Contraseña (opcional)",
+      "placeholder": "déjalo en blanco para no modificar"
+    },
+    "role": {
+      "label": "Perfil *"
+    },
+    "roles": {
+      "User": "User",
+      "Admin": "Admin"
+    },
+    "buttons": {
+      "save": "Guardar cambios"
+    },
+    "errors": {
+      "nameRequired": "El nombre es obligatorio",
+      "emailRequired": "El correo electrónico es obligatorio",
+      "emailInvalid": "Correo electrónico inválido",
+      "usernameRequired": "El nombre de usuario es obligatorio"
+    },
+    "alert": {
+      "errorTitle": "Error",
+      "invalidRecord": "Registro inválido",
+      "successTitle": "Éxito",
+      "updated": "¡Usuario actualizado!",
+      "updateFailed": "Fallo al actualizar usuario"
+    }
+  },
+  "userList": {
+    "title": "Usuarios",
+    "alert": {
+      "loadError": "No fue posible cargar los usuarios",
+      "deleteTitle": "Eliminar usuario",
+      "deleteMessage": "¿Deseas eliminar a {{name}}?",
+      "deleteSuccess": "Usuario eliminado",
+      "deleteFail": "No fue posible eliminar el usuario"
+    },
+    "search": {
+      "placeholder": "Buscar por nombre, correo, usuario o rol..."
+    },
+    "empty": {
+      "title": "Ningún usuario",
+      "subtitle": "Toca “+” para registrar"
+    }
+  },
+  "motorcycleForm": {
+    "alert": {
+      "requiredTitle": "Campos obligatorios",
+      "requiredMessage": "Ingresa Matrícula, Modelo y Área.",
+      "errorTitle": "Error",
+      "saveFailed": "Fallo al guardar"
+    },
+    "fields": {
+      "plate": {
+        "label": "Matrícula *",
+        "placeholder": "ABC1D23"
+      },
+      "model": {
+        "label": "Modelo *",
+        "placeholder": "CG 160"
+      },
+      "year": {
+        "label": "Año",
+        "placeholder": "2022"
+      },
+      "areas": {
+        "label": "Áreas *"
+      }
+    },
+    "actions": {
+      "save": "Guardar"
+    }
+  },
+  "motorcycleList": {
+    "title": "Mis Motos",
+    "search": {
+      "placeholder": "Buscar por modelo, matrícula o área..."
+    },
+    "stats": "{{count}} motos encontradas",
+    "alert": {
+      "loadErrorTitle": "Error",
+      "loadErrorMessage": "No fue posible cargar las motos",
+      "deleteTitle": "Confirmar eliminación",
+      "deleteMessage": "¿Deseas eliminar la moto {{model}}?",
+      "deleteSuccess": "Moto eliminada con éxito",
+      "deleteFail": "No fue posible eliminar la moto"
+    },
+    "registeredAt": "Registrada el {{date}}",
+    "empty": {
+      "titleNotFound": "No se encontraron motos",
+      "subtitleNotFound": "Intenta ajustar tu búsqueda",
+      "titleNone": "Ninguna moto registrada",
+      "subtitleNone": "Empieza agregando tu primera moto"
+    },
+    "actions": {
+      "add": "Registrar Moto"
+    }
+  },
+  "settings": {
+    "title": "Configuración",
+    "logout": {
+      "confirmTitle": "Confirmar cierre de sesión",
+      "confirmMessage": "¿Realmente deseas cerrar sesión de tu cuenta?",
+      "confirmButton": "Cerrar sesión"
+    },
+    "darkTheme": {
+      "title": "Tema oscuro",
+      "subtitle": "Alternar entre tema claro y oscuro"
+    },
+    "about": {
+      "title": "Acerca de la app",
+      "subtitle": "Información sobre la aplicación",
+      "message": "Motorcycle Manager v1.0.0\n\nAplicación para gestionar tus motocicletas de forma simple y eficiente.\n\nDesarrollada con React Native y Firebase."
+    },
+    "help": {
+      "title": "Ayuda",
+      "subtitle": "Dudas y soporte",
+      "message": "Para soporte, contacta:\n\n• Correo: soporte@motorcyclemanager.com\n• Teléfono: +55 (11) 99999-9999\n\nHorario de atención:\nLunes a viernes, 9:00–18:00"
+    },
+    "account": {
+      "logout": {
+        "title": "Cerrar sesión",
+        "subtitle": "Salir de la aplicación"
+      }
+    },
+    "section": {
+      "language": "Idioma",
+      "debug": "Depuración de idioma",
+      "preferences": "Preferencias",
+      "account": "Cuenta"
+    },
+    "user": {
+      "active": "Cuenta activa"
+    },
+    "version": "Motorcycle Manager v1.0.0"
+  }
+}

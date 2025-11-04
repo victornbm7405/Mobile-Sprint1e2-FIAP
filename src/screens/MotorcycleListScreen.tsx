@@ -1,4 +1,5 @@
-﻿"use client"
+﻿// src/screens/MotorcycleListScreen.tsx
+"use client"
 
 import type React from "react"
 import { useState, useEffect, useCallback } from "react"
@@ -19,6 +20,7 @@ import { motorcycleService } from "../services/motorcycleService"
 import type { Motorcycle } from "../types/motorcycle"
 import { useFocusEffect } from "@react-navigation/native"
 import { listAreas, type Area } from "../services/areaService"
+import { useTranslation } from "react-i18next"
 
 interface MotorcycleListScreenProps {
   navigation: any
@@ -26,6 +28,7 @@ interface MotorcycleListScreenProps {
 
 export const MotorcycleListScreen: React.FC<MotorcycleListScreenProps> = ({ navigation }) => {
   const { theme } = useTheme()
+  const { t, i18n } = useTranslation()
   const [motorcycles, setMotorcycles] = useState<Motorcycle[]>([])
   const [filteredMotorcycles, setFilteredMotorcycles] = useState<Motorcycle[]>([])
   const [loading, setLoading] = useState(true)
@@ -76,7 +79,10 @@ export const MotorcycleListScreen: React.FC<MotorcycleListScreenProps> = ({ navi
       )
     } catch (error) {
       console.error("Error loading motorcycles:", error)
-      Alert.alert("Erro", "Não foi possível carregar as motos")
+      Alert.alert(
+        t("motorcycleList.alert.loadErrorTitle", { defaultValue: "Erro" }),
+        t("motorcycleList.alert.loadErrorMessage", { defaultValue: "Não foi possível carregar as motos" })
+      )
     } finally {
       setLoading(false)
       setRefreshing(false)
@@ -106,20 +112,29 @@ export const MotorcycleListScreen: React.FC<MotorcycleListScreenProps> = ({ navi
 
   const handleDelete = (motorcycle: Motorcycle) => {
     Alert.alert(
-      "Confirmar exclusão",
-      `Deseja excluir a moto ${motorcycle.modelo}?`,
+      t("motorcycleList.alert.deleteTitle", { defaultValue: "Confirmar exclusão" }),
+      t("motorcycleList.alert.deleteMessage", {
+        defaultValue: "Deseja excluir a moto {{model}}?",
+        model: (motorcycle as any).modelo,
+      }),
       [
-        { text: "Cancelar", style: "cancel" },
+        { text: t("common.cancel", { defaultValue: "Cancelar" }), style: "cancel" },
         {
-          text: "Excluir",
+          text: t("common.delete", { defaultValue: "Excluir" }),
           style: "destructive",
           onPress: async () => {
             try {
               await motorcycleService.delete((motorcycle as any).id)
               loadMotorcycles()
-              Alert.alert("Sucesso", "Moto excluída com sucesso")
+              Alert.alert(
+                t("common.success", { defaultValue: "Sucesso" }),
+                t("motorcycleList.alert.deleteSuccess", { defaultValue: "Moto excluída com sucesso" }),
+              )
             } catch (error) {
-              Alert.alert("Erro", "Não foi possível excluir a moto")
+              Alert.alert(
+                t("common.error", { defaultValue: "Erro" }),
+                t("motorcycleList.alert.deleteFail", { defaultValue: "Não foi possível excluir a moto" }),
+              )
             }
           },
         },
@@ -131,66 +146,77 @@ export const MotorcycleListScreen: React.FC<MotorcycleListScreenProps> = ({ navi
     navigation.navigate("EditMotorcycle", { motorcycle })
   }
 
-  const renderMotorcycleItem = ({ item }: { item: any }) => (
-    <View
-      style={[
-        styles.motorcycleCard,
-        { backgroundColor: theme.surface, borderColor: theme.border },
-      ]}
-    >
-      <View style={styles.motorcycleHeader}>
-        <View
-          style={[
-            styles.motorcycleIcon,
-            { backgroundColor: `${theme.primary}20` },
-          ]}
-        >
-          <Ionicons name="bicycle" size={24} color={theme.primary} />
-        </View>
-        <View style={styles.motorcycleInfo}>
-          <Text style={[styles.motorcycleModel, { color: theme.text }]}>
-            {item.modelo}
-          </Text>
-          <Text
-            style={[styles.motorcyclePlate, { color: theme.textSecondary }]}
-          >
-            {item.placa}
-          </Text>
-          {/* Exibe NOME da área (ou id se não encontrado) no lugar do fabricante */}
-          <Text
-            style={[styles.motorcycleBrand, { color: theme.textSecondary }]}
-          >
-            {areaName(item.areaId)}
-          </Text>
-        </View>
-        <View style={styles.motorcycleActions}>
-          <TouchableOpacity
+  const renderMotorcycleItem = ({ item }: { item: any }) => {
+    // locale amigável conforme idioma atual
+    const locale = i18n.language?.startsWith("en") ? "en-US" : "pt-BR"
+    const dateText = item.createdAt
+      ? new Date(item.createdAt).toLocaleDateString(locale)
+      : ""
+
+    return (
+      <View
+        style={[
+          styles.motorcycleCard,
+          { backgroundColor: theme.surface, borderColor: theme.border },
+        ]}
+      >
+        <View style={styles.motorcycleHeader}>
+          <View
             style={[
-              styles.actionButton,
+              styles.motorcycleIcon,
               { backgroundColor: `${theme.primary}20` },
             ]}
-            onPress={() => handleEdit(item)}
           >
-            <Ionicons name="pencil" size={16} color={theme.primary} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.actionButton,
-              { backgroundColor: `${theme.error}20` },
-            ]}
-            onPress={() => handleDelete(item)}
-          >
-            <Ionicons name="trash" size={16} color={theme.error} />
-          </TouchableOpacity>
+            <Ionicons name="bicycle" size={24} color={theme.primary} />
+          </View>
+          <View style={styles.motorcycleInfo}>
+            <Text style={[styles.motorcycleModel, { color: theme.text }]}>
+              {item.modelo}
+            </Text>
+            <Text
+              style={[styles.motorcyclePlate, { color: theme.textSecondary }]}
+            >
+              {item.placa}
+            </Text>
+            {/* Exibe NOME da área (ou id se não encontrado) no lugar do fabricante */}
+            <Text
+              style={[styles.motorcycleBrand, { color: theme.textSecondary }]}
+            >
+              {areaName(item.areaId)}
+            </Text>
+          </View>
+          <View style={styles.motorcycleActions}>
+            <TouchableOpacity
+              style={[
+                styles.actionButton,
+                { backgroundColor: `${theme.primary}20` },
+              ]}
+              onPress={() => handleEdit(item)}
+            >
+              <Ionicons name="pencil" size={16} color={theme.primary} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.actionButton,
+                { backgroundColor: `${theme.error}20` },
+              ]}
+              onPress={() => handleDelete(item)}
+            >
+              <Ionicons name="trash" size={16} color={theme.error} />
+            </TouchableOpacity>
+          </View>
+        </View>
+        <View style={styles.motorcycleFooter}>
+          <Text style={[styles.motorcycleDate, { color: theme.textSecondary }]}>
+            {t("motorcycleList.registeredAt", {
+              defaultValue: "Cadastrada em {{date}}",
+              date: dateText,
+            })}
+          </Text>
         </View>
       </View>
-      <View style={styles.motorcycleFooter}>
-        <Text style={[styles.motorcycleDate, { color: theme.textSecondary }]}>
-          Cadastrada em {new Date(item.createdAt).toLocaleDateString("pt-BR")}
-        </Text>
-      </View>
-    </View>
-  )
+    )
+  }
 
   const renderEmptyState = () => (
     <View style={styles.emptyState}>
@@ -200,17 +226,23 @@ export const MotorcycleListScreen: React.FC<MotorcycleListScreenProps> = ({ navi
         <Ionicons name="bicycle" size={48} color={theme.primary} />
       </View>
       <Text style={[styles.emptyTitle, { color: theme.text }]}>
-        {searchQuery ? "Nenhuma moto encontrada" : "Nenhuma moto cadastrada"}
+        {searchQuery
+          ? t("motorcycleList.empty.titleNotFound", { defaultValue: "Nenhuma moto encontrada" })
+          : t("motorcycleList.empty.titleNone", { defaultValue: "Nenhuma moto cadastrada" })}
       </Text>
       <Text style={[styles.emptySubtitle, { color: theme.textSecondary }]}>
-        {searchQuery ? "Tente ajustar sua pesquisa" : "Comece adicionando sua primeira moto"}
+        {searchQuery
+          ? t("motorcycleList.empty.subtitleNotFound", { defaultValue: "Tente ajustar sua pesquisa" })
+          : t("motorcycleList.empty.subtitleNone", { defaultValue: "Comece adicionando sua primeira moto" })}
       </Text>
       {!searchQuery && (
         <TouchableOpacity
           style={[styles.emptyButton, { backgroundColor: theme.primary }]}
           onPress={() => navigation.navigate("AddMotorcycle")}
         >
-          <Text style={styles.emptyButtonText}>Cadastrar Moto</Text>
+          <Text style={styles.emptyButtonText}>
+            {t("motorcycleList.actions.add", { defaultValue: "Cadastrar Moto" })}
+          </Text>
         </TouchableOpacity>
       )}
     </View>
@@ -223,7 +255,9 @@ export const MotorcycleListScreen: React.FC<MotorcycleListScreenProps> = ({ navi
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color={theme.text} />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: theme.text }]}>Minhas Motos</Text>
+        <Text style={[styles.headerTitle, { color: theme.text }]}>
+          {t("motorcycleList.title", { defaultValue: "Minhas Motos" })}
+        </Text>
         <TouchableOpacity
           onPress={() => navigation.navigate("AddMotorcycle")}
           style={[styles.addButton, { backgroundColor: theme.primary }]}
@@ -243,7 +277,9 @@ export const MotorcycleListScreen: React.FC<MotorcycleListScreenProps> = ({ navi
           <Ionicons name="search" size={20} color={theme.textSecondary} />
           <TextInput
             style={[styles.searchInput, { color: theme.text }]}
-            placeholder="Buscar por modelo, placa ou área..."
+            placeholder={t("motorcycleList.search.placeholder", {
+              defaultValue: "Buscar por modelo, placa ou área...",
+            })}
             placeholderTextColor={theme.textSecondary}
             value={searchQuery}
             onChangeText={setSearchQuery}
@@ -259,10 +295,11 @@ export const MotorcycleListScreen: React.FC<MotorcycleListScreenProps> = ({ navi
       {/* Stats */}
       <View style={styles.statsContainer}>
         <Text style={[styles.statsText, { color: theme.textSecondary }]}>
-          {filteredMotorcycles.length}{" "}
-          {filteredMotorcycles.length === 1
-            ? "moto encontrada"
-            : "motos encontradas"}
+          {t("motorcycleList.stats", {
+            count: filteredMotorcycles.length,
+            defaultValue:
+              "{{count}} motos encontradas",
+          })}
         </Text>
       </View>
 

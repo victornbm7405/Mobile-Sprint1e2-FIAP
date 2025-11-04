@@ -3,8 +3,15 @@
 import type React from "react";
 import { useState } from "react";
 import {
-  SafeAreaView, View, Text, StyleSheet, KeyboardAvoidingView, Platform,
-  ScrollView, Alert, TouchableOpacity
+  SafeAreaView,
+  View,
+  Text,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Alert,
+  TouchableOpacity,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../contexts/ThemeContext";
@@ -12,9 +19,11 @@ import { CustomInput } from "../components/CustomInput";
 import { CustomButton } from "../components/CustomButton";
 import { userService } from "../services/userService";
 import { useNavigation } from "@react-navigation/native";
+import { useTranslation } from "react-i18next";
 
 const AddUserScreen: React.FC = () => {
   const { theme } = useTheme();
+  const { t } = useTranslation();
   const nav = useNavigation<any>();
   const [loading, setLoading] = useState(false);
   const [role, setRole] = useState<"User" | "Admin">("User");
@@ -29,11 +38,14 @@ const AddUserScreen: React.FC = () => {
 
   const validate = () => {
     const e: Record<string, string> = {};
-    if (!form.nome.trim()) e.nome = "Nome é obrigatório";
-    if (!form.email.trim()) e.email = "Email é obrigatório";
-    else if (!/\S+@\S+\.\S+/.test(form.email)) e.email = "Email inválido";
-    if (!form.username.trim()) e.username = "Username é obrigatório";
-    if (!form.senha.trim() || form.senha.length < 6) e.senha = "Senha deve ter 6+ caracteres";
+    if (!form.nome.trim()) e.nome = t("userAdd.errors.nameRequired", { defaultValue: "Nome é obrigatório" });
+    if (!form.email.trim()) e.email = t("userAdd.errors.emailRequired", { defaultValue: "Email é obrigatório" });
+    else if (!/\S+@\S+\.\S+/.test(form.email))
+      e.email = t("userAdd.errors.emailInvalid", { defaultValue: "Email inválido" });
+    if (!form.username.trim())
+      e.username = t("userAdd.errors.usernameRequired", { defaultValue: "Username é obrigatório" });
+    if (!form.senha.trim() || form.senha.length < 6)
+      e.senha = t("userAdd.errors.passwordMin", { defaultValue: "Senha deve ter 6+ caracteres" });
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -43,11 +55,22 @@ const AddUserScreen: React.FC = () => {
     setLoading(true);
     try {
       await userService.create({ ...form, senha: form.senha, role });
-      Alert.alert("Sucesso", "Usuário criado!", [{ text: "OK", onPress: () => nav.goBack() }]);
+      Alert.alert(
+        t("userAdd.alert.successTitle", { defaultValue: "Sucesso" }),
+        t("userAdd.alert.successMessage", { defaultValue: "Usuário criado!" }),
+        [{ text: "OK", onPress: () => nav.goBack() }]
+      );
     } catch (err: any) {
-      Alert.alert("Erro", err?.message ?? "Falha ao criar usuário");
-    } finally { setLoading(false); }
+      Alert.alert(
+        t("userAdd.alert.errorTitle", { defaultValue: "Erro" }),
+        err?.message ?? t("userAdd.alert.errorMessage", { defaultValue: "Falha ao criar usuário" })
+      );
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const roleLabel = (r: "User" | "Admin") => t(`userAdd.roles.${r}`, { defaultValue: r });
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
@@ -57,7 +80,9 @@ const AddUserScreen: React.FC = () => {
           <TouchableOpacity onPress={() => nav.goBack()} style={styles.backButton}>
             <Ionicons name="arrow-back" size={24} color={theme.text} />
           </TouchableOpacity>
-          <Text style={[styles.headerTitle, { color: theme.text }]}>Cadastrar Usuário</Text>
+          <Text style={[styles.headerTitle, { color: theme.text }]}>
+            {t("userAdd.title", { defaultValue: "Cadastrar Usuário" })}
+          </Text>
           <View style={{ width: 40 }} />
         </View>
 
@@ -67,32 +92,76 @@ const AddUserScreen: React.FC = () => {
             <View style={[styles.iconCircle, { backgroundColor: `${theme.primary}20` }]}>
               <Ionicons name="person-add" size={48} color={theme.primary} />
             </View>
-            <Text style={[styles.iconText, { color: theme.textSecondary }]}>Preencha os dados do usuário</Text>
+            <Text style={[styles.iconText, { color: theme.textSecondary }]}>
+              {t("userAdd.subtitle", { defaultValue: "Preencha os dados do usuário" })}
+            </Text>
           </View>
 
           <View style={styles.form}>
-            <CustomInput label="Nome" value={form.nome} onChangeText={(v) => setForm({ ...form, nome: v })} placeholder="Nome completo" error={errors.nome} />
-            <CustomInput label="Email" value={form.email} onChangeText={(v) => setForm({ ...form, email: v })} placeholder="user@email.com" keyboardType="email-address" error={errors.email} />
-            <CustomInput label="Username" value={form.username} onChangeText={(v) => setForm({ ...form, username: v })} placeholder="victor" error={errors.username} />
-            <CustomInput label="Senha" value={form.senha} onChangeText={(v) => setForm({ ...form, senha: v })} placeholder="mín. 6 caracteres" secureTextEntry error={errors.senha} />
+            <CustomInput
+              label={t("userAdd.name.label", { defaultValue: "Nome" })}
+              value={form.nome}
+              onChangeText={(v) => setForm({ ...form, nome: v })}
+              placeholder={t("userAdd.name.placeholder", { defaultValue: "Nome completo" })}
+              error={errors.nome}
+            />
+
+            <CustomInput
+              label={t("userAdd.email.label", { defaultValue: "Email" })}
+              value={form.email}
+              onChangeText={(v) => setForm({ ...form, email: v })}
+              placeholder={t("userAdd.email.placeholder", { defaultValue: "user@email.com" })}
+              keyboardType="email-address"
+              error={errors.email}
+            />
+
+            <CustomInput
+              label={t("userAdd.username.label", { defaultValue: "Username" })}
+              value={form.username}
+              onChangeText={(v) => setForm({ ...form, username: v })}
+              placeholder={t("userAdd.username.placeholder", { defaultValue: "victor" })}
+              error={errors.username}
+            />
+
+            <CustomInput
+              label={t("userAdd.password.label", { defaultValue: "Senha" })}
+              value={form.senha}
+              onChangeText={(v) => setForm({ ...form, senha: v })}
+              placeholder={t("userAdd.password.placeholder", { defaultValue: "mín. 6 caracteres" })}
+              secureTextEntry
+              error={errors.senha}
+            />
 
             {/* role chips */}
-            <Text style={[styles.suggestionsTitle, { color: theme.textSecondary }]}>Perfil *</Text>
+            <Text style={[styles.suggestionsTitle, { color: theme.textSecondary }]}>
+              {t("userAdd.role.label", { defaultValue: "Perfil *" })}
+            </Text>
             <View style={styles.suggestionsGrid}>
               {(["User", "Admin"] as const).map((r) => (
                 <TouchableOpacity
                   key={r}
-                  style={[styles.suggestionChip, { backgroundColor: theme.surface, borderColor: theme.border, opacity: role === r ? 0.9 : 1 }]}
+                  style={[
+                    styles.suggestionChip,
+                    { backgroundColor: theme.surface, borderColor: theme.border, opacity: role === r ? 0.9 : 1 },
+                  ]}
                   onPress={() => setRole(r)}
                 >
-                  <Text style={[styles.suggestionText, { color: theme.text }]}>{r}</Text>
+                  <Text style={[styles.suggestionText, { color: theme.text }]}>{roleLabel(r)}</Text>
                 </TouchableOpacity>
               ))}
             </View>
 
             <View style={styles.buttons}>
-              <CustomButton title="Cadastrar" onPress={submit} loading={loading} />
-              <CustomButton title="Cancelar" onPress={() => nav.goBack()} variant="outline" />
+              <CustomButton
+                title={t("userAdd.submit", { defaultValue: "Cadastrar" })}
+                onPress={submit}
+                loading={loading}
+              />
+              <CustomButton
+                title={t("userAdd.cancel", { defaultValue: "Cancelar" })}
+                onPress={() => nav.goBack()}
+                variant="outline"
+              />
             </View>
           </View>
         </ScrollView>
@@ -102,13 +171,27 @@ const AddUserScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1 }, keyboard: { flex: 1 },
-  header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 20, paddingVertical: 16 },
+  container: { flex: 1 },
+  keyboard: { flex: 1 },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+  },
   backButton: { width: 40, height: 40, alignItems: "center", justifyContent: "center" },
   headerTitle: { fontSize: 18, fontWeight: "600" },
   content: { padding: 20 },
   iconWrap: { alignItems: "center", marginBottom: 32 },
-  iconCircle: { width: 96, height: 96, borderRadius: 24, alignItems: "center", justifyContent: "center", marginBottom: 16 },
+  iconCircle: {
+    width: 96,
+    height: 96,
+    borderRadius: 24,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 16,
+  },
   iconText: { fontSize: 16, textAlign: "center" },
   form: { gap: 20 },
   suggestionsTitle: { fontSize: 14, marginBottom: 8 },

@@ -16,14 +16,17 @@ import { useTheme } from "../contexts/ThemeContext";
 import { useAuth } from "../contexts/AuthContext";
 import { CustomButton } from "../components/CustomButton";
 import { CustomInput } from "../components/CustomInput";
+import { useTranslation } from "react-i18next";
 
 export const AuthScreen: React.FC = () => {
   const { theme } = useTheme();
-  const { login } = useAuth(); // <- usamos a API do backend via AuthContext
+  const { login } = useAuth(); // API do backend via AuthContext
+  const { t } = useTranslation();
+
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
 
-  // Agora usamos username (o backend espera username/senha)
+  // username/senha (o backend espera isso)
   const [formData, setFormData] = useState({
     username: "",
     password: "",
@@ -35,18 +38,25 @@ export const AuthScreen: React.FC = () => {
     const newErrors: { [key: string]: string } = {};
 
     if (!formData.username) {
-      newErrors.username = "Usuário é obrigatório";
+      newErrors.username = t("auth.errors.usernameRequired", {
+        defaultValue: "Usuário é obrigatório",
+      });
     }
 
     if (!formData.password) {
-      newErrors.password = "Senha é obrigatória";
+      newErrors.password = t("auth.errors.passwordRequired", {
+        defaultValue: "Senha é obrigatória",
+      });
     } else if (formData.password.length < 3) {
-      // simples, só pra evitar vazio
-      newErrors.password = "Senha deve ter pelo menos 3 caracteres";
+      newErrors.password = t("auth.errors.passwordMin", {
+        defaultValue: "Senha deve ter pelo menos 3 caracteres",
+      });
     }
 
     if (!isLogin && formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Senhas não coincidem";
+      newErrors.confirmPassword = t("auth.errors.passwordMismatch", {
+        defaultValue: "Senhas não coincidem",
+      });
     }
 
     setErrors(newErrors);
@@ -62,10 +72,19 @@ export const AuthScreen: React.FC = () => {
         await login(formData.username, formData.password);
       } else {
         // Sem endpoint de cadastro no backend neste momento
-        Alert.alert("Aviso", "Cadastro desativado no momento. Use a opção de login.");
+        Alert.alert(
+          t("auth.alert.warnTitle", { defaultValue: "Aviso" }),
+          t("auth.alert.signupDisabled", {
+            defaultValue: "Cadastro desativado no momento. Use a opção de login.",
+          })
+        );
       }
     } catch (error: any) {
-      Alert.alert("Erro", error?.message || "Não foi possível entrar");
+      Alert.alert(
+        t("auth.alert.errorTitle", { defaultValue: "Erro" }),
+        error?.message ||
+          t("auth.alert.genericError", { defaultValue: "Não foi possível entrar" })
+      );
     } finally {
       setLoading(false);
     }
@@ -89,52 +108,74 @@ export const AuthScreen: React.FC = () => {
               <Text style={styles.logoText}>M</Text>
             </View>
             <Text style={[styles.title, { color: theme.text }]}>
-              {isLogin ? "Bem-vindo de volta" : "Criar conta"}
+              {isLogin
+                ? t("auth.title.login", { defaultValue: "Bem-vindo de volta" })
+                : t("auth.title.register", { defaultValue: "Criar conta" })}
             </Text>
             <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
               {isLogin
-                ? "Faça login para gerenciar suas motos"
-                : "Cadastre-se para começar a gerenciar suas motos"}
+                ? t("auth.subtitle.login", {
+                    defaultValue: "Faça login para gerenciar suas motos",
+                  })
+                : t("auth.subtitle.register", {
+                    defaultValue: "Cadastre-se para começar a gerenciar suas motos",
+                  })}
             </Text>
           </View>
 
           <View style={styles.form}>
             <CustomInput
-              label="Usuário"
+              label={t("auth.username.label", { defaultValue: "Usuário" })}
               value={formData.username}
               onChangeText={(text) => setFormData({ ...formData, username: text })}
-              placeholder="admin"
+              placeholder={t("auth.username.placeholder", { defaultValue: "admin" })}
               error={errors.username}
             />
 
             <CustomInput
-              label="Senha"
+              label={t("auth.password.label", { defaultValue: "Senha" })}
               value={formData.password}
               onChangeText={(text) => setFormData({ ...formData, password: text })}
-              placeholder="Sua senha"
+              placeholder={t("auth.password.placeholder", { defaultValue: "Sua senha" })}
               secureTextEntry
               error={errors.password}
             />
 
             {!isLogin && (
               <CustomInput
-                label="Confirmar Senha"
+                label={t("auth.confirmPassword.label", { defaultValue: "Confirmar Senha" })}
                 value={formData.confirmPassword}
-                onChangeText={(text) => setFormData({ ...formData, confirmPassword: text })}
-                placeholder="Confirme sua senha"
+                onChangeText={(text) =>
+                  setFormData({ ...formData, confirmPassword: text })
+                }
+                placeholder={t("auth.confirmPassword.placeholder", {
+                  defaultValue: "Confirme sua senha",
+                })}
                 secureTextEntry
                 error={errors.confirmPassword}
               />
             )}
 
             <CustomButton
-              title={isLogin ? "Entrar" : "Cadastrar"}
+              title={
+                isLogin
+                  ? t("auth.buttons.login", { defaultValue: "Entrar" })
+                  : t("auth.buttons.register", { defaultValue: "Cadastrar" })
+              }
               onPress={handleSubmit}
               loading={loading}
             />
 
             <CustomButton
-              title={isLogin ? "Não tem conta? Cadastre-se" : "Já tem conta? Faça login"}
+              title={
+                isLogin
+                  ? t("auth.buttons.toRegister", {
+                      defaultValue: "Não tem conta? Cadastre-se",
+                    })
+                  : t("auth.buttons.toLogin", {
+                      defaultValue: "Já tem conta? Faça login",
+                    })
+              }
               onPress={toggleMode}
               variant="outline"
             />
@@ -145,7 +186,7 @@ export const AuthScreen: React.FC = () => {
   );
 };
 
-// ⚠️ CSS inalterado:
+// ⚠️ CSS inalterado
 const styles = StyleSheet.create({
   container: {
     flex: 1,
