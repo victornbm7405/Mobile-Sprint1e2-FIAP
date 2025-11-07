@@ -4,11 +4,12 @@ import 'react-native-gesture-handler';
 
 import "./src/utils/internationalization"; // inicializa i18n UMA vez
 
-import React from "react";
-import { NavigationContainer } from "@react-navigation/native";
+import React, { useEffect } from "react"; // ⬅️ adicionado useEffect
+import { NavigationContainer, createNavigationContainerRef } from "@react-navigation/native"; // ⬅️ adicionado createNavigationContainerRef
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
+import * as Notifications from "expo-notifications"; // ⬅️ adicionado
 import { useTranslation } from "react-i18next";
 import { ActivityIndicator, View } from "react-native";
 
@@ -29,6 +30,9 @@ import EditUserScreen from "./src/screens/EditUserScreen";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
+
+// ⬇️ ref global para navegar a partir do listener de notificação
+const navigationRef = createNavigationContainerRef<any>();
 
 const TabNavigator = () => {
   const { theme } = useTheme();
@@ -115,7 +119,8 @@ const AppNavigator = () => {
   }
 
   return (
-    <NavigationContainer>
+    // ⬇️ passamos o ref para navegar ao tocar na notificação
+    <NavigationContainer ref={navigationRef}>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {user ? (
           <>
@@ -134,6 +139,27 @@ const AppNavigator = () => {
 };
 
 export default function App() {
+  // ⬇️ Listener para abrir a tela ao tocar / iniciar pelo push
+  useEffect(() => {
+    const sub = Notifications.addNotificationResponseReceivedListener((response) => {
+      const data: any = response.notification.request.content.data;
+      if (data?.motoId && navigationRef.isReady()) {
+        navigationRef.navigate("EditMotorcycle", { id: data.motoId });
+      }
+    });
+
+    // Se o app foi ABERTO a partir de uma notificação (estado "morto")
+    (async () => {
+      const last = await Notifications.getLastNotificationResponseAsync();
+      const data: any = last?.notification.request.content.data;
+      if (last && data?.motoId && navigationRef.isReady()) {
+        navigationRef.navigate("EditMotorcycle", { id: data.motoId });
+      }
+    })();
+
+    return () => sub.remove();
+  }, []);
+
   return (
     <ThemeProvider>
       <AuthProvider>

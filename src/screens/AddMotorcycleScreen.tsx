@@ -14,6 +14,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import * as Notifications from "expo-notifications"; // ← ADICIONADO
 import { useTheme } from "../contexts/ThemeContext";
 import { motorcycleService } from "../services/motorcycleService";
 import { CustomButton } from "../components/CustomButton";
@@ -37,6 +38,31 @@ export const AddMotorcycleScreen: React.FC<AddMotorcycleScreenProps> = ({ naviga
     areaId: undefined as unknown as number, // obrigatório
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+  // ▶️ Configuração mínima de notificações (permite alert em foreground + canal Android)
+  useEffect(() => {
+    Notifications.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: true,
+        shouldSetBadge: false,
+      }),
+    });
+
+    (async () => {
+      const perm = await Notifications.getPermissionsAsync();
+      if (perm.status !== "granted") {
+        await Notifications.requestPermissionsAsync();
+      }
+      if (Platform.OS === "android") {
+        await Notifications.setNotificationChannelAsync("default", {
+          name: "default",
+          importance: Notifications.AndroidImportance.MAX,
+          vibrationPattern: [0, 250, 250, 250],
+        });
+      }
+    })();
+  }, []);
 
   // Áreas para seleção (substitui “fabricantes populares”)
   const [areas, setAreas] = useState<Area[]>([]);
@@ -79,11 +105,24 @@ export const AddMotorcycleScreen: React.FC<AddMotorcycleScreenProps> = ({ naviga
 
     setLoading(true);
     try {
-      await motorcycleService.save({
+      const created: any = await motorcycleService.save({
         modelo: formData.modelo.trim(),
         placa: formData.placa.trim().toUpperCase(),
         areaId: formData.areaId!,
       } as any);
+
+      // 🔔 Notificação local imediata (sem servidor)
+      const placa = (created?.placa ?? formData.placa).toUpperCase();
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: t("motoAdd.notify.title", { defaultValue: "Moto cadastrada" }),
+          body: t("motoAdd.notify.body", {
+            defaultValue: `A moto ${placa} foi cadastrada com sucesso.`,
+          }),
+          data: { motoId: created?.id, placa },
+        },
+        trigger: null, // imediato
+      });
 
       Alert.alert(
         t("motoAdd.alert.successTitle", { defaultValue: "Sucesso" }),
