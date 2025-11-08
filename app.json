@@ -21,7 +21,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#10B981"
-      }
+      },
+      "package": "com.victornievesmedeiros136.motorcyclemanager"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -30,6 +31,13 @@
       "expo-router",
       "expo-localization",
       "expo-notifications"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "98ed43ef-f250-4714-af16-5069569db9d8"
+      }
+    },
+    "owner": "victornievesmedeiros136"
   }
 }
