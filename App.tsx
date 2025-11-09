@@ -28,6 +28,9 @@ import UserListScreen from "./src/screens/UserListScreen";
 import AddUserScreen from "./src/screens/AddUserScreen";
 import EditUserScreen from "./src/screens/EditUserScreen";
 
+// ✅ (1) IMPORT NECESSÁRIO: AboutScreen
+import AboutScreen from "./src/screens/AboutScreen";
+
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -129,6 +132,8 @@ const AppNavigator = () => {
             {/* ▼ Rotas adicionais de usuário */}
             <Stack.Screen name="AddUser" component={AddUserScreen} />
             <Stack.Screen name="EditUser" component={EditUserScreen} />
+            {/* ✅ (2) ROTA NECESSÁRIA: About */}
+            <Stack.Screen name="About" component={AboutScreen} />
           </>
         ) : (
           <Stack.Screen name="Auth" component={AuthScreen} />

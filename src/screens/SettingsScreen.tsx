@@ -52,15 +52,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
       subtitle: t("settings.about.subtitle", { defaultValue: "Informações sobre o aplicativo" }),
       icon: "information-circle" as const,
       type: "navigation" as const,
-      onPress: () => {
-        Alert.alert(
-          t("settings.about.title", { defaultValue: "Sobre o App" }),
-          t("settings.about.message", {
-            defaultValue:
-              "Motorcycle Manager v1.0.0\n\nAplicativo para gerenciar suas motocicletas de forma simples e eficiente.\n\nDesenvolvido com React Native e Firebase.",
-          }),
-        )
-      },
+      onPress: () => navigation.navigate("About"), // ✅ MUDANÇA ÚNICA: abre nova tela
     },
     {
       title: t("settings.help.title", { defaultValue: "Ajuda" }),
