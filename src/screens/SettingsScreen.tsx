@@ -20,7 +20,7 @@ interface SettingsScreenProps {
 export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   const { theme, isDark, toggleTheme } = useTheme()
   const { user, logout } = useAuth()
-  const { i18n, t } = useTranslation()
+  const { t } = useTranslation() // 🔧 removido i18n (não é mais usado)
 
   const handleLogout = () => {
     Alert.alert(
@@ -170,7 +170,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
         </View>
 
         {/* Idioma */}
-        <View style={styles.section}>
+        <View className="language-section" style={styles.section}>
           <Text style={[styles.sectionTitle, { color: theme.text }]}>
             {t("settings.section.language", { defaultValue: "Idioma" })}
           </Text>
@@ -179,37 +179,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
           </View>
         </View>
 
-        {/* 🔎 Debug de Idioma */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: theme.text }]}>
-            {t("settings.section.debug", { defaultValue: "Debug de Idioma" })}
-          </Text>
-          <View
-            style={{
-              borderWidth: 1,
-              borderColor: theme.border,
-              backgroundColor: theme.surface,
-              borderRadius: 12,
-              padding: 12,
-              gap: 6,
-            }}
-          >
-            <Text style={{ color: theme.textSecondary }}>
-              i18n.language: {i18n.language} | resolved: {i18n.resolvedLanguage}
-            </Text>
-            <Text style={{ color: theme.textSecondary }}>
-              has pt bundle? {String(i18n.hasResourceBundle("pt", "translation"))} | has en bundle?{" "}
-              {String(i18n.hasResourceBundle("en", "translation"))}
-            </Text>
-            <Text style={{ color: theme.textSecondary }}>
-              key "tabs.home" existe? PT: {String(i18n.exists("tabs.home", { lng: "pt" }))} | EN:{" "}
-              {String(i18n.exists("tabs.home", { lng: "en" }))} | atual: {String(i18n.exists("tabs.home"))}
-            </Text>
-            <Text style={{ color: theme.textSecondary }}>
-              preview "tabs.home": {t("tabs.home", { defaultValue: "(sem chave)" })}
-            </Text>
-          </View>
-        </View>
+        {/* (🔧 Removido bloco de Debug de Idioma) */}
 
         {/* Settings Section */}
         <View style={styles.section}>

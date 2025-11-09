@@ -4,9 +4,9 @@ import { useTranslation } from "react-i18next";
 
 export default function LanguageSwitcher() {
   const { i18n } = useTranslation();
-  const [pending, setPending] = useState<"pt" | "en" | null>(null);
+  const [pending, setPending] = useState<"pt" | "es" | null>(null); // 🔧 en -> es
 
-  async function change(code: "pt" | "en") {
+  async function change(code: "pt" | "es") { // 🔧 en -> es
     try {
       console.log("[i18n] changeLanguage start:", code);
       setPending(code);
@@ -36,7 +36,7 @@ export default function LanguageSwitcher() {
     }
   }
 
-  const Btn = ({ code, label }: { code: "pt" | "en"; label: string }) => (
+  const Btn = ({ code, label }: { code: "pt" | "es"; label: string }) => ( // 🔧 en -> es
     <Pressable
       disabled={pending !== null}
       onPress={() => change(code)}
@@ -52,7 +52,7 @@ export default function LanguageSwitcher() {
   return (
     <View style={styles.row}>
       <Btn code="pt" label="Português" />
-      <Btn code="en" label="English" />
+      <Btn code="es" label="Español" /> {/* 🔧 English -> Español */}
       <Text style={styles.lang}>({i18n.language} → {i18n.resolvedLanguage})</Text>
     </View>
   );
