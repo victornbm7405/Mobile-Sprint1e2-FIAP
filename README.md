@@ -10,12 +10,14 @@ Aplicativo mobile em **React Native + Expo** para gestão de **motos** e **área
 Gerenciar o ciclo de vida de motos da operação (criar, listar, editar e excluir), vinculando cada moto a uma **área**. O acesso é controlado por **login/logout** (Firebase).
 
 ### ✨ Funcionalidades
-- **Autenticação** com Firebase (login / logout, persistência de sessão)
+- **Autenticação** via JWT (login / logout)
 - **CRUD de Motos** (Create, Read, Update, Delete)
 - **Associação de Área** por moto (consumo de API REST de Áreas)
 - **Lista com busca/atualização** e tela de **detalhes/edição**
 - **Tema claro/escuro** (Theme Context)
 - **Navegação** com **Expo Router**
+- ** Mudança de linguas**
+- **Notificação local** quando uma moto é cadastrada
 
 ---
 
@@ -23,69 +25,69 @@ Gerenciar o ciclo de vida de motos da operação (criar, listar, editar e exclui
 
 ```text
 Mobile-Sprint1e2-FIAP-main/
-│   ├── .env
-│   ├── .gitignore
-│   ├── App.tsx
+├── .env
+├── .gitignore
+├── App.tsx
+├── README.md
+├── app.json
+├── babel.config.js
+├── components.json
+├── eas.json
+├── package.json
+├── tsconfig.json
+├── .expo/
 │   ├── README.md
-│   ├── app.json
-│   ├── babel.config.js
-│   ├── components.json
-│   ├── package-lock.json
-│   ├── package.json
-│   ├── tsconfig.json
-  ├── .expo/
-  │   ├── README.md
-  │   ├── devices.json
-  ├── app/
-  │   ├── favicon.ico
-  │   ├── globals.css
-  │   ├── layout.tsx
-  │   ├── page.tsx
-  ├── assets/
-  │   ├── adaptive-icon.png
-  │   ├── favicon.png
-  │   ├── icon.png
-  │   ├── splash.png
-  ├── lib/
-  │   ├── utils.ts
-  ├── src/
+│   └── devices.json
+├── app/
+│   ├── favicon.ico
+│   ├── globals.css
+│   ├── layout.tsx
+│   └── page.tsx
+├── assets/
+│   ├── adaptive-icon.png
+│   ├── favicon.png
+│   ├── icon.png
+│   └── splash.png
+├── lib/
+│   └── utils.ts
+└── src/
     ├── components/
     │   ├── CustomButton.tsx
     │   ├── CustomInput.tsx
+    │   └── LanguageSwitcher.tsx
     ├── config/
-    │   ├── firebase.ts
+    │   └── firebase.ts
     ├── contexts/
     │   ├── AuthContext.tsx
-    │   ├── ThemeContext.tsx
+    │   └── ThemeContext.tsx
+    ├── i18n/
+    │   ├── en.json
+    │   └── pt.json
     ├── screens/
+    │   ├── AboutScreen.tsx
     │   ├── AddMotorcycleScreen.tsx
-    │   ├── AddMotorcycleScreen.tsx.bak
+    │   ├── AddUserScreen.tsx
     │   ├── AuthScreen.tsx
     │   ├── EditMotorcycleScreen.tsx
+    │   ├── EditUserScreen.tsx
     │   ├── HomeScreen.tsx
     │   ├── MotorcycleFormScreen.tsx
     │   ├── MotorcycleListScreen.tsx
-    │   ├── MotorcycleListScreen.tsx.bak
     │   ├── SettingsScreen.tsx
+    │   └── UserListScreen.tsx
     ├── services/
     │   ├── areaService.ts
-    │   ├── areaService.ts.bak
     │   ├── config.ts
-    │   ├── config.ts.bak
+    │   ├── http.ts
     │   ├── motorcycleService.ts
-    │   ├── motorcycleService.ts.bak
+    │   ├── rest.ts
+    │   └── userService.ts
     ├── types/
-    │   ├── motorcycle.ts
-    │   ├── motorcycle.ts.bak
-```
-
-> Pastas-chave:
-- `src/screens/` — Telas (Auth, Home, Lista/Edição/Cadastro de Motos, Settings)
-- `src/services/` — Integração com API (`motorcycleService.ts`, `areaService.ts`, `config.ts`)
-- `src/contexts/` — `AuthContext.tsx`, `ThemeContext.tsx`
-- `src/config/` — `firebase.ts` (inicialização do Firebase)
-- `app/` — Rotas e layout via **expo-router**
-- `assets/` — Ícones e imagens do aplicativo
+    │   └── motorcycle.ts
+    └── utils/
+        ├── formatador.ts
+        ├── internationalization.ts
+        └── notifications.ts
 
 ---
 
@@ -99,46 +101,37 @@ RM 554557 Victor Medeiros
 https://sprint1-dotnet.onrender.com
 ---
 
-## ▶️ Como Rodar no **Expo Go**
+## ✅ Como rodar
 
-### 1) Pré-requisitos
-- **Node.js 20.x** (recomendado)
-- **Expo CLI** (usar via `npx expo` já é suficiente)
-- App **Expo Go** instalado no celular (Android/iOS)
-- Estar **no mesmo Wi‑Fi** do computador (para modo LAN)
+1) **Baixar e instalar o APK**
+   - Link da build (Expo): `https://expo.dev/accounts/victornievesmedeiros136/projects/motorcycle-manager/builds/93e4680e-0e73-4e96-84b9-374e4ac2f834`
+   - No Android, habilite **Instalar apps de fontes desconhecidas** (se necessário).
+   - Toque no arquivo **.apk** baixado e conclua a instalação.
 
-### 2) Instalação
+2) **Abrir o aplicativo**
+   - Conceda as permissões solicitadas (principalmente **Câmera**, usada para **leitura de QR Code**).
+
+### Instalação
 ```bash
 # dentro da pasta do projeto
 npm install
-```
-
-### 3) Variáveis de Ambiente
-O arquivo `.env` tem que estar desse jeito:
-
-```env
-EXPO_PUBLIC_FIREBASE_API_KEY="AIzaSyByhxFhGfeu_aV40oOuwKzIAPwCnPe9Tfg"
-EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN="projetovictor-817ad.firebaseapp.com"
-EXPO_PUBLIC_FIREBASE_PROJECT_ID="projetovictor-817ad"
-EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET="projetovictor-817ad.firebasestorage.app"
-EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID="777243568227"
-EXPO_PUBLIC_FIREBASE_APP_ID="1:777243568227:web:e19b9011be5ec79fe2b056"
+``
 
 # API base
 https://sprint1-dotnet.onrender.com
 
-### 4) Iniciar o projeto
+### Iniciar o projeto
 ```bash
 npx expo start
+
 ```
 
-- **Conexão LAN (recomendada no mesmo Wi‑Fi):** abra o Expo Go e escaneie o QR Code.
-- **Se a LAN não funcionar:** pressione **`?`** no terminal do Expo e selecione **Tunnel** (ou execute com `--tunnel`).
+- **Conexão LAN (recomendada no mesmo Wi‑Fi):** abra o aplicativo e escaneie o QR Code gerado pelo npx expo start.
+
 
 ### 5) Erros comuns
 - **Assets faltando (`icon.png`, `splash.png`)**: garanta que existam em `assets/` (ou ajuste `app.json`).
 - **Variáveis `.env` não lidas**: reinicie o bundler (`r`) e confirme os nomes das chaves acima.
-- **Firebase Auth ‘component not registered’**: confira a inicialização em `src/config/firebase.ts` e que não há import cíclico.
 
 ---
 
